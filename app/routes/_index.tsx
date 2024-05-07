@@ -3,12 +3,13 @@ import type { MetaFunction } from "@remix-run/node";
 import { useEffect, useRef } from "react";
 import Typed from "typed.js";
 
-import { SiDocker, SiJavascript, SiKotlin, SiRemix, SiTailwindcss, SiTypescript } from "react-icons/si";
+import { SiDocker, SiFigma, SiGithub, SiJavascript, SiKotlin, SiRemix, SiTailwindcss, SiTypescript } from "react-icons/si";
 import { DiNodejs } from "react-icons/di";
 
 import Navbar from "~/components/navbar";
 import Project from "~/components/projects/project";
 import naimroslan from "~/assets/naimroslan.png";
+import { useNavigate } from "@remix-run/react";
 
 export const meta: MetaFunction = () => {
   return [
@@ -17,6 +18,7 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Index() {
+  const navigate = useNavigate()
   const skills = useRef(null);
 
   useEffect(() => {
@@ -30,6 +32,10 @@ export default function Index() {
       typed.destroy();
     }
   }, [])
+
+  const handleGithubClick = () => {
+    window.open('https://github.com/naimroslan/', '_blank');
+  }
 
   return (
     <div className="font-SpaceGrotesk space-y-10">
@@ -48,7 +54,15 @@ export default function Index() {
             <img src={naimroslan} />
           </div> */}
         </div>
-        <div className="flex flex-row justify-between mt-96">
+        <div className="flex justify-end">
+          <div className="flex flex-row mt-64">
+            <div className="w-48 border-t border-gray-400 mx-4 mt-4"></div>
+            <div className="cursor-pointer" onClick={handleGithubClick}>
+              <SiGithub size={30} title="Check out my Github profile!"/>
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-row justify-between mt-36">
           <div className="font-medium text-xl">
             ABOUT
           </div>
@@ -64,13 +78,14 @@ export default function Index() {
             <div className="text-lg">
               Take a look at my stack
               <div className="flex flex-row space-x-4 mt-2">
-                <SiRemix size={20} />
-                <SiJavascript size={20}/>
-                <SiTypescript size={20}/>
-                <SiKotlin size={20}/>
-                <DiNodejs className="-mt-5" size={60}/>
-                <SiTailwindcss size={20}/>
-                <SiDocker size={20}/>
+                <SiRemix size={20} title="Remix JS"/>
+                <SiJavascript size={20} title="JavaScript"/>
+                <SiTypescript size={20} title="TypeScript"/>
+                <SiKotlin size={20} title="Kotlin"/>
+                <DiNodejs className="-mt-5" size={60} title="Node.js"/>
+                <SiTailwindcss size={20} title="Tailwind CSS"/>
+                <SiDocker size={20} title="Docker"/>
+                <SiFigma size={20} title="Figma"/>
               </div>
             </div>
           </div>
@@ -88,6 +103,7 @@ export default function Index() {
               they call it a typo? Well, Dosa Aksara is like that, but for speech mishaps.
               We used to use Google Forms for this, but I felt like it was missing a lot
               of features, like proper filtering. So I decided to make my own thing."
+              link="https://dosa-aksara.naimroslan.dev"
             />
             <div></div>
             <Project 
@@ -95,6 +111,7 @@ export default function Index() {
               description="Ez2Sign is an e-signature system crafter on Remix JS and styles with
               Tailwind CSS. It makes signing documents online super easy. You can add up to 3 parties,
               and they'll all get the email updates on the signing progress."
+              link="#"
             />
           </div>
         </div>

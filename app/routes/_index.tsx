@@ -18,12 +18,15 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Index() {
-  const navigate = useNavigate()
   const skills = useRef(null);
+
+  const homeRef = useRef(null)
+  const aboutRef = useRef(null)
+  const projectRef = useRef(null)
 
   useEffect(() => {
     const typed = new Typed(skills.current, {
-      strings: ['Remix JS', 'JavaScript', 'TypeScript', 'React Native', 'Kotlin/Java', 'Node.js', 'Tailwind CSS', 'Docker'],
+      strings: ['Remix JS', 'JavaScript', 'TypeScript', 'React Native', 'Kotlin/Java', 'Node.js', 'Tailwind CSS', 'Docker', 'Figma'],
       typeSpeed: 80,
     });
 
@@ -38,8 +41,8 @@ export default function Index() {
   }
 
   return (
-    <div className="font-SpaceGrotesk space-y-10">
-      <Navbar />
+    <div className="font-SpaceGrotesk space-y-10" ref={homeRef}>
+      <Navbar homeRef={homeRef} aboutRef={aboutRef} projectRef={projectRef} />
       <div className="flex flex-col px-12">
         <div className="flex flex-row">
           <div className="flex flex-col">
@@ -62,7 +65,7 @@ export default function Index() {
             </div>
           </div>
         </div>
-        <div className="flex flex-row justify-between mt-36">
+        <div className="flex flex-row justify-between mt-36" ref={aboutRef}>
           <div className="font-medium text-xl">
             ABOUT
           </div>
@@ -90,29 +93,51 @@ export default function Index() {
             </div>
           </div>
         </div>
-        <div className="flex flex-col mt-96 space-y-4">
+        <div className="flex flex-col mt-96 space-y-8" ref={projectRef}>
           <div className="font-medium text-xl">
             PROJECT
           </div>
-          <div className="flex flex-row space-x-4">
-            <Project 
-              title="Dosa Aksara"
-              description="Dosa Aksara is this (silly) little side project I made for my friends.
-              Okay, so here's the story — we've been friends since college. Over the years,
-              we've been mispronouncing words like crazy. You know how people mistype a word,
-              they call it a typo? Well, Dosa Aksara is like that, but for speech mishaps.
-              We used to use Google Forms for this, but I felt like it was missing a lot
-              of features, like proper filtering. So I decided to make my own thing."
-              link="https://dosa-aksara.naimroslan.dev"
-            />
-            <div></div>
-            <Project 
-              title="Ez2Sign"
-              description="Ez2Sign is an e-signature system crafter on Remix JS and styles with
-              Tailwind CSS. It makes signing documents online super easy. You can add up to 3 parties,
-              and they'll all get the email updates on the signing progress."
-              link="#"
-            />
+          <div className="flex justify-center">
+            <div className="flex flex-row space-x-4">
+              <div className="flex flex-col space-y-4">
+                <Project 
+                  title="Dosa Aksara"
+                  description="Dosa Aksara is this (silly) little side project I made for my friends.
+                  Okay, so here's the story — we've been friends since college. Over the years,
+                  we've been mispronouncing words like crazy. You know how people mistype a word,
+                  they call it a typo? Well, Dosa Aksara is like that, but for speech mishaps.
+                  We used to use Google Forms for this, but I felt like it was missing a lot
+                  of features, like proper filtering. So I decided to make my own thing."
+                  link="https://dosa-aksara.naimroslan.dev"
+                />
+                <Project 
+                  title="Let 'em know"
+                  description={
+                    <>
+                      (Upcoming)
+                      <br/>
+                      Early 2025
+                    </>
+                  }
+                />
+              </div>
+              <div className="flex flex-col space-y-4">
+                <Project 
+                  title="Ez2Sign"
+                  description="Ez2Sign is an e-signature system crafter on Remix JS and styles with
+                  Tailwind CSS. It makes signing documents online super easy. You can add up to 3 parties,
+                  and they'll all get the email updates on the signing progress."
+                  link="#"
+                />
+                <Project 
+                  title="MySecurePasskey"
+                  description="MySecurePasskey is a Single Sign-On system with eKYC functionality.
+                  Users can log in to any system that requires eKYC, but they only need to do it once
+                  during MySecurePasskey registration. The system uses OpenID Connect protocol for single
+                  sign-on and FIDO2 for passwordless authentication"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>

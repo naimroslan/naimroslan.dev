@@ -48,21 +48,21 @@ export default function Navbar({ homeRef, aboutRef, projectRef}) {
               onClick={() => handleNavClick(homeRef)}
             >
               HOME
-              {activeSection === 'home' && <div className="w-2 h-2 bg-gray-900 rounded-full absolute -bottom-2" />}
+              {activeSection === 'home' && <div className="w-2 h-2 bg-gray-900 rounded-full absolute mt-1 ml-5" />}
             </span>
             <span 
               className={`cursor-pointer ${activeSection === 'about' ? 'font-bold' : ''}`}
               onClick={() => handleNavClick(aboutRef)}
             >
               ABOUT
-              {activeSection === 'about' && <div className="w-2 h-2 bg-gray-900 rounded-full absolute -bottom-2" />}
+              {activeSection === 'about' && <div className="w-2 h-2 bg-gray-900 rounded-full absolute mt-1 ml-5" />}
             </span>
             <span 
               className={`cursor-pointer ${activeSection === 'project' ? 'font-bold' : ''}`}
               onClick={() => handleNavClick(projectRef)}
             >
               PROJECT
-              {activeSection === 'project' && <div className="w-2 h-2 bg-gray-900 rounded-full absolute -bottom-2" />}
+              {activeSection === 'project' && <div className="w-2 h-2 bg-gray-900 rounded-full absolute mt-1 ml-7" />}
             </span>
           </div>
           <span className="text-gray-900">CONTACT</span>

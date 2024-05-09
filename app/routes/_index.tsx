@@ -46,19 +46,16 @@ export default function Index() {
       <div className="flex flex-col px-12">
         <div className="flex flex-row">
           <div className="flex flex-col">
-            <div className="text-8xl font-medium">
+            <div className="animate-slidein [--slidein-delay:300ms] opacity-0 text-8xl font-medium">
               HI, I'M<br/>NAIM ROSLAN
             </div>
-            <div className="text-2xl font-medium">
+            <div className="animate-slidein [--slidein-delay:500ms] opacity-0 text-2xl font-medium">
               I'm a software engineer. I can do <span ref={skills} />
             </div>
           </div>
-          {/* <div>
-            <img src={naimroslan} />
-          </div> */}
         </div>
         <div className="flex justify-end">
-          <div className="flex flex-row mt-64">
+          <div className="animate-slidein [--slidein-delay:700ms] opacity-0 flex flex-row mt-64">
             <div className="w-48 border-t border-gray-400 mx-4 mt-4"></div>
             <div className="cursor-pointer" onClick={handleGithubClick}>
               <SiGithub size={30} title="Check out my Github profile!"/>
@@ -67,7 +64,7 @@ export default function Index() {
         </div>
         <div ref={aboutRef}>
           <div className="flex flex-row justify-between mt-36">
-            <div className="font-medium text-xl">
+            <div className="animate-slidein [--slidein-delay:300ms] opacity-0 font-medium text-xl">
               ABOUT
             </div>
             <div className="flex flex-col space-y-4">
@@ -114,14 +111,10 @@ export default function Index() {
                     link="https://dosa-aksara.naimroslan.dev"
                   />
                   <Project 
-                    title="Let 'em know"
-                    description={
-                      <>
-                        (Upcoming)
-                        <br/>
-                        Early 2025
-                      </>
-                    }
+                    title="Typit.in iOS Shortcuts"
+                    description="I sorta put together an iOS Shortcut using the Typit.in API. Typit.in
+                    is this super catchy temporary URL shortener."
+                    link="https://www.icloud.com/shortcuts/0b0bad32615e422697d1c3b1d556b2ab"
                   />
                 </div>
                 <div className="flex flex-col space-y-4">
@@ -130,7 +123,7 @@ export default function Index() {
                     description="Ez2Sign is an e-signature system crafter on Remix JS and styles with
                     Tailwind CSS. It makes signing documents online super easy. You can add up to 3 parties,
                     and they'll all get the email updates on the signing progress."
-                    link="#"
+                    link="https://crissthecoder.netlify.app/project/esign"
                   />
                   <Project 
                     title="MySecurePasskey"

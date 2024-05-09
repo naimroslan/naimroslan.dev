@@ -65,7 +65,7 @@ export default function Navbar({ homeRef, aboutRef, projectRef}) {
               {activeSection === 'project' && <div className="w-2 h-2 bg-gray-900 rounded-full absolute mt-1 ml-7" />}
             </span>
           </div>
-          <span className="text-gray-900">CONTACT</span>
+          <span className="text-gray-900 cursor-pointer" onClick={() => navigate("/contact")}>CONTACT</span>
         </div>
       </div>
     </nav>

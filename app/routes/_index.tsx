@@ -41,7 +41,7 @@ export default function Index() {
   }
 
   return (
-    <div className="font-SpaceGrotesk space-y-10" ref={homeRef}>
+    <div className="font-SpaceGrotesk space-y-10 py-5 px-10" style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }} ref={homeRef}>
       <Navbar homeRef={homeRef} aboutRef={aboutRef} projectRef={projectRef} />
       <div className="flex flex-col px-12">
         <div className="flex flex-row">
@@ -123,7 +123,7 @@ export default function Index() {
                     description="Ez2Sign is an e-signature system crafter on Remix JS and styles with
                     Tailwind CSS. It makes signing documents online super easy. You can add up to 3 parties,
                     and they'll all get the email updates on the signing progress."
-                    link="https://crissthecoder.netlify.app/project/esign"
+                    link="#"
                   />
                   <Project 
                     title="MySecurePasskey"

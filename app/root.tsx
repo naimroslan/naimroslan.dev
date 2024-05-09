@@ -32,8 +32,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return(
-    <div className="py-5 px-10" style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
-      <Outlet />
-    </div>
+    <Outlet />
   );
 }

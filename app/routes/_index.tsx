@@ -41,7 +41,7 @@ export default function Index() {
   }
 
   return (
-    <div className="font-SpaceGrotesk space-y-10 py-5 px-10" style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }} ref={homeRef}>
+    <div className="font-SpaceGrotesk space-y-10 py-5 px-10" ref={homeRef}>
       <Navbar homeRef={homeRef} aboutRef={aboutRef} projectRef={projectRef} />
       <div className="flex flex-col px-12">
         <div className="flex flex-row">

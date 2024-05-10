@@ -11,7 +11,7 @@ export default function ErrorNotFound() {
           <div className="flex flex-row items-center">
             <div className="flex flex-col">
               <div className="text-lg">I believe...</div>
-              <div className="text-3xl font-medium">you're lost, sire!</div>
+              <div className="text-3xl font-medium">you're lost, sire! </div>
             </div>
             <div>
               <img src={lost} />

@@ -9,6 +9,7 @@ import {
 } from "@remix-run/react";
 
 import "~/tailwind.css";
+import ErrorNotFound from "./routes/error_not_found";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -36,4 +37,22 @@ export default function App() {
   return(
     <Outlet />
   );
+}
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+  console.error('error', error);
+  return(
+    <html>
+      <head>
+        <title>Oh no!</title>
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        <ErrorNotFound />
+        <Scripts />
+      </body>
+    </html>
+  )
 }

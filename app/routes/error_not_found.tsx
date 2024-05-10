@@ -1,6 +1,9 @@
+import { useNavigate } from "@remix-run/react";
 import lost from "~/assets/lost-john-travolta.gif";
 
 export default function ErrorNotFound() {
+  const navigate = useNavigate();
+
   return(
     <div className="h-screen overflow-hidden">
       <div className="flex flex-col font-SpaceGrotesk justify-center items-center mt-28">
@@ -16,7 +19,7 @@ export default function ErrorNotFound() {
           </div>
         </div>
         <div className="mt-4">
-          <button className="py-4 px-8 bg-black rounded-lg text-white">Let's go home</button>
+          <button className="py-4 px-8 bg-black rounded-lg text-white cursor-pointer" onClick={() => navigate("/")}>Let's go home</button>
         </div>
       </div>
     </div>

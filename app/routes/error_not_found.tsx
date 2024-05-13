@@ -5,10 +5,10 @@ export default function ErrorNotFound() {
   const navigate = useNavigate();
 
   return(
-    <div className="h-screen overflow-hidden">
+    <div className="h-screen overflow-hidden px-5 py-10">
       <div className="flex flex-col font-SpaceGrotesk justify-center items-center mt-28">
         <div className="h-full">
-          <div className="flex flex-row items-center">
+          <div className="flex flex-col lg:flex-row items-center">
             <div className="flex flex-col">
               <div className="text-lg">I believe...</div>
               <div className="text-3xl font-medium">you're lost, sire! </div>

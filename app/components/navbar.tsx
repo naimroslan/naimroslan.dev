@@ -62,28 +62,28 @@ export default function Navbar({ homeRef, aboutRef, projectRef}) {
                 onClick={() => handleNavClick(homeRef)}
               >
                 HOME
-                {activeSection === 'home' && <div className="lg:w-2 lg:h-2 bg-gray-900 sm:rounded-full sm:absolute sm:mt-1 sm:ml-5" />}
+                {activeSection === 'home' && <div className="lg:w-2 lg:h-2 bg-gray-900 rounded-full absolute mt-1 ml-5" />}
               </span>
               <span 
                 className={`cursor-pointer ${activeSection === 'about' ? 'font-bold' : ''}`}
                 onClick={() => handleNavClick(aboutRef)}
               >
                 ABOUT
-                {activeSection === 'about' && <div className="lg:w-2 lg:h-2 bg-gray-900 sm:rounded-full sm:absolute sm:mt-1 sm:ml-5" />}
+                {activeSection === 'about' && <div className="lg:w-2 lg:h-2 bg-gray-900 rounded-full absolute mt-1 ml-5" />}
               </span>
               <span 
                 className={`cursor-pointer ${activeSection === 'project' ? 'font-bold' : ''}`}
                 onClick={() => handleNavClick(projectRef)}
               >
                 PROJECT
-                {activeSection === 'project' && <div className="lg:w-2 lg:h-2 bg-gray-900 sm:rounded-full sm:absolute sm:mt-1 sm:ml-5" />}
+                {activeSection === 'project' && <div className="lg:w-2 lg:h-2 bg-gray-900 rounded-full absolute mt-1 ml-5" />}
               </span>
               <span 
                 className={` cursor-pointer ${activeSection === 'contact' ? 'font-bold' : ''} lg:hidden`}
                 onClick={() => navigate("/contact")}
               >
                 CONTACT
-                {activeSection === 'contact' && <div className="lg:w-2 lg:h-2 bg-gray-900 sm:rounded-full sm:absolute sm:mt-1 sm:ml-5" />}
+                {activeSection === 'contact' && <div className="lg:w-2 lg:h-2 bg-gray-900 rounded-full absolute mt-1 ml-5" />}
               </span>
             </div>
           </div>

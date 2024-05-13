@@ -23,15 +23,15 @@ export default function Contact() {
           <div className="flex flex-col space-y-8">
             <div className="flex flex-row items-center space-x-4">
               <div className="flex flex-col font-medium text-7xl">
-                <div>REACH</div>
-                <div>ME</div>
-                <div>OUT</div>
+                <div className="animate-slidein [--slidein-delay:300ms] opacity-0">REACH</div>
+                <div className="animate-slidein [--slidein-delay:500ms] opacity-0">ME</div>
+                <div className="animate-slidein [--slidein-delay:700ms] opacity-0">OUT</div>
               </div>
               <div>
                 
               </div>
             </div>
-            <div className="flex flex-row justify-between">
+            <div className="animate-slidein [--slidein-delay:700ms] opacity-0 flex flex-col space-y-2 lg:space-y-0 lg:flex-row justify-between">
               <div className="flex flex-row items-center space-x-2 cursor-pointer" onClick={handleLinkedInOnClick}>
                 <SiLinkedin />
                 <div>LinkedIn</div>

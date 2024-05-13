@@ -41,15 +41,15 @@ export default function Index() {
   }
 
   return (
-    <div className="font-SpaceGrotesk space-y-10 py-5 px-10" ref={homeRef}>
+    <div className="font-SpaceGrotesk space-y-10 px-10 py-5" ref={homeRef}>
       <Navbar homeRef={homeRef} aboutRef={aboutRef} projectRef={projectRef} />
-      <div className="flex flex-col px-12">
+      <div className="flex flex-col">
         <div className="flex flex-row">
           <div className="flex flex-col">
-            <div className="animate-slidein [--slidein-delay:300ms] opacity-0 text-8xl font-medium">
+            <div className="animate-slidein [--slidein-delay:300ms] opacity-0 text-4xl lg:text-8xl font-medium">
               HI, I'M<br/>NAIM ROSLAN
             </div>
-            <div className="animate-slidein [--slidein-delay:500ms] opacity-0 text-2xl font-medium">
+            <div className="animate-slidein [--slidein-delay:500ms] opacity-0 text-xl lg:text-2xl font-medium">
               I'm a software engineer. I can do <span ref={skills} />
             </div>
           </div>
@@ -63,7 +63,7 @@ export default function Index() {
           </div>
         </div>
         <div ref={aboutRef}>
-          <div className="flex flex-row justify-between mt-36">
+          <div className="flex flex-col space-y-4 lg:space-y-0 lg:flex-row justify-between mt-36">
             <div className="animate-slidein [--slidein-delay:300ms] opacity-0 font-medium text-xl">
               ABOUT
             </div>
@@ -98,7 +98,7 @@ export default function Index() {
               PROJECT
             </div>
             <div className="flex justify-center">
-              <div className="flex flex-row space-x-4">
+              <div className="flex flex-col lg:flex-row space-y-4 lg:space-x-4 lg:space-y-0">
                 <div className="flex flex-col space-y-4">
                   <Project 
                     title="Dosa Aksara"

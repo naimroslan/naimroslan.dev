@@ -4,6 +4,11 @@ const plugin = require('tailwindcss/plugin');
 export default {
   content: ['./app/**/*.{js,jsx,ts,tsx}'],
   theme: {
+    screens: {
+      'sm': '640px',
+      'md': '768px',
+      'lg': '1024px'
+    },
     extend: {
       fontFamily: {
         SpaceGrotesk: "'Space Grotesk', system-ui",

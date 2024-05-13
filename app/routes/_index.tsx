@@ -123,7 +123,7 @@ export default function Index() {
                     description="Ez2Sign is an e-signature system crafter on Remix JS and styles with
                     Tailwind CSS. It makes signing documents online super easy. You can add up to 3 parties,
                     and they'll all get the email updates on the signing progress."
-                    link="#"
+                    link={null}
                   />
                   <Project 
                     title="MySecurePasskey"
@@ -131,6 +131,7 @@ export default function Index() {
                     Users can log in to any system that requires eKYC, but they only need to do it once
                     during MySecurePasskey registration. The system uses OpenID Connect protocol for single
                     sign-on and FIDO2 for passwordless authentication"
+                    link={null}
                   />
                 </div>
               </div>

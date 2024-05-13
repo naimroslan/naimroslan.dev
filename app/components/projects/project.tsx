@@ -2,7 +2,9 @@
 export default function Project({ title, description, link}: any) {
 
   const handleProjectOnClick = () => {
-    window.open(`${link}`, '_blank')
+    if (link) {
+      window.open(`${link}`, '_blank')
+    }
   }
 
   return (

@@ -46,17 +46,17 @@ export default function Navbar({ homeRef, aboutRef, projectRef}) {
       <div className="max-w-5xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <span 
-            className="text-2xl text-gray-900 font-semibold cursor-pointer md:text-center" 
+            className="text-2xl text-gray-900 font-semibold cursor-pointer" 
             onClick={() => handleNavClick(homeRef)}
           >
             naimroslan.
           </span>
-          <div className="flex md:flex-col relative">
+          <div className="flex flex-col relative">
             <div className="lg:hidden relative" onClick={toggleMenu}>
               <HiOutlineMenuAlt3 />
             </div>
             {/* Dropdown menu */}
-            <div className={`absolute top-full right-0 ${isMenuOpen ? 'flex flex-col mt-4 text-right' : 'hidden'} lg:flex flex-row space-x-4 text-gray-900`}>
+            <div className={`${isMenuOpen ? 'absolute top-full right-0 flex flex-col mt-4 text-right' : 'hidden'} lg:flex flex-row space-x-4 text-gray-900`}>
               <span 
                 className={`ml-4 cursor-pointer ${activeSection === 'home' ? 'font-bold' : ''}`} 
                 onClick={() => handleNavClick(homeRef)}

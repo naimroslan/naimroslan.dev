@@ -32,5 +32,16 @@ If you're familiar with deploying Node applications, the built-in Remix app serv
 
 Make sure to deploy the output of `npm run build`
 
-- `build/server`
+-- `build/server`
 - `build/client`
+
+### Docker
+
+To build and run your app in Docker:
+
+```bash
+docker build -t portfolio .
+docker run -d --name portfolio -p 3000:3000 portfolio
+```
+
+Then configure your reverse proxy or DNS (e.g. Cloudflare) to point to your server's IP.

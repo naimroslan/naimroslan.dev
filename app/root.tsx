@@ -1,16 +1,27 @@
 import {
+  isRouteErrorResponse,
   Links,
-  LiveReload,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
-  isRouteErrorResponse,
-  useRouteError,
-} from "@remix-run/react";
+} from "react-router";
 
-import "~/tailwind.css";
-import ErrorNotFound from "./routes/error_not_found";
+import type { Route } from "./+types/root";
+import "./app.css";
+
+export const links: Route.LinksFunction = () => [
+  { rel: "preconnect", href: "https://fonts.googleapis.com" },
+  {
+    rel: "preconnect",
+    href: "https://fonts.gstatic.com",
+    crossOrigin: "anonymous",
+  },
+  {
+    rel: "stylesheet",
+    href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap",
+  },
+];
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -20,10 +31,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet" />
       </head>
       <body>
         {children}
@@ -35,25 +42,34 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return(
-    <Outlet />
-  );
+  return <Outlet />;
 }
 
-export function ErrorBoundary() {
-  const error = useRouteError();
-  console.error('error', error);
-  return(
-    <html>
-      <head>
-        <title>Oh no!</title>
-        <Meta />
-        <Links />
-      </head>
-      <body>
-        <ErrorNotFound />
-        <Scripts />
-      </body>
-    </html>
-  )
+export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+  let message = "Oops!";
+  let details = "An unexpected error occurred.";
+  let stack: string | undefined;
+
+  if (isRouteErrorResponse(error)) {
+    message = error.status === 404 ? "404" : "Error";
+    details =
+      error.status === 404
+        ? "The requested page could not be found."
+        : error.statusText || details;
+  } else if (import.meta.env.DEV && error && error instanceof Error) {
+    details = error.message;
+    stack = error.stack;
+  }
+
+  return (
+    <main className="pt-16 p-4 container mx-auto">
+      <h1>{message}</h1>
+      <p>{details}</p>
+      {stack && (
+        <pre className="w-full p-4 overflow-x-auto">
+          <code>{stack}</code>
+        </pre>
+      )}
+    </main>
+  );
 }

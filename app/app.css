@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+@theme {
+    --font-sans:
+        "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+        "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+html,
+body {
+    @apply bg-white text-gray-900;
+}
+
+@layer utilities {
+    @keyframes slidein {
+        from {
+            opacity: 0;
+            transform: translateY(12px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-slidein {
+        opacity: 0;
+        animation: slidein 0.6s ease forwards;
+        animation-delay: var(--slidein-delay, 0ms);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .animate-slidein {
+            opacity: 1;
+            animation: none;
+        }
+    }
+}

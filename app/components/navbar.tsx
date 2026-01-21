@@ -1,52 +1,59 @@
-import { useNavigate } from "@remix-run/react";
-import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router";
+import { useEffect, useState, type RefObject } from "react";
 import { HiOutlineMenuAlt3 } from "react-icons/hi";
 
-export default function Navbar({ homeRef, aboutRef, projectRef}) {
-  const navigate = useNavigate()
-  const [activeSection, setActiveSection] = useState<string>('home')
+type SectionRefs = {
+  homeRef: RefObject<HTMLDivElement>;
+  aboutRef: RefObject<HTMLDivElement>;
+  projectRef: RefObject<HTMLDivElement>;
+};
+
+export default function Navbar({ homeRef, aboutRef, projectRef }: SectionRefs) {
+  const navigate = useNavigate();
+  const [activeSection, setActiveSection] = useState<string>("home");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // function to toggle the visibility of the dropdown meny
   const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen)
-  }
+    setIsMenuOpen(!isMenuOpen);
+  };
 
   useEffect(() => {
     const handleScroll = () => {
       const homePosition = homeRef.current?.getBoundingClientRect().top || 0;
       const aboutPosition = aboutRef.current?.getBoundingClientRect().top || 0;
-      const projectPosition = projectRef.current?.getBoundingClientRect().top || 0;
+      const projectPosition =
+        projectRef.current?.getBoundingClientRect().top || 0;
 
       if (homePosition >= 0 && homePosition < window.innerHeight) {
-        setActiveSection('home');
+        setActiveSection("home");
       } else if (aboutPosition >= 0 && aboutPosition < window.innerHeight) {
-        setActiveSection('about');
+        setActiveSection("about");
       } else if (projectPosition >= 0 && projectPosition < window.innerHeight) {
-        setActiveSection('project');
+        setActiveSection("project");
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [homeRef, aboutRef, projectRef]);
 
-  const handleNavClick = (ref) => {
+  const handleNavClick = (ref: RefObject<HTMLDivElement>) => {
     if (ref.current) {
-      ref.current.scrollIntoView({ 
-        behavior: 'smooth'
-      })
+      ref.current.scrollIntoView({
+        behavior: "smooth",
+      });
 
-      setIsMenuOpen(false)
+      setIsMenuOpen(false);
     }
-  }
-  
+  };
+
   return (
-    <nav className="sticky top-2 z-10 bg-white backdrop-filter backdrop-blur-lg bg-opacity-30 border-b border-gray-200 rounded-full">
+    <nav className="sticky top-2 z-10 bg-white/30 backdrop-blur-md border border-gray-200/60 rounded-full shadow-sm">
       <div className="max-w-5xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <span 
-            className="text-2xl text-gray-900 font-semibold cursor-pointer" 
+          <span
+            className="text-2xl text-gray-900 font-semibold cursor-pointer"
             onClick={() => handleNavClick(homeRef)}
           >
             naimroslan.
@@ -56,42 +63,57 @@ export default function Navbar({ homeRef, aboutRef, projectRef}) {
               <HiOutlineMenuAlt3 />
             </div>
             {/* Dropdown menu */}
-            <div className={`${isMenuOpen ? 'absolute top-full right-0 flex flex-col mt-4 text-right' : 'hidden'} lg:flex flex-row space-x-4 text-gray-900`}>
-              <span 
-                className={`ml-4 cursor-pointer ${activeSection === 'home' ? 'font-bold' : ''}`} 
+            <div
+              className={`${isMenuOpen ? "absolute top-full right-0 flex flex-col mt-4 text-right" : "hidden"} lg:flex flex-row space-x-4 text-gray-900`}
+            >
+              <span
+                className={`ml-4 cursor-pointer ${activeSection === "home" ? "font-bold" : ""}`}
                 onClick={() => handleNavClick(homeRef)}
               >
                 HOME
-                {activeSection === 'home' && <div className="lg:w-2 lg:h-2 bg-gray-900 rounded-full absolute mt-1 ml-5" />}
+                {activeSection === "home" && (
+                  <div className="lg:w-2 lg:h-2 bg-gray-900 rounded-full absolute mt-1 ml-5" />
+                )}
               </span>
-              <span 
-                className={`cursor-pointer ${activeSection === 'about' ? 'font-bold' : ''}`}
+              <span
+                className={`cursor-pointer ${activeSection === "about" ? "font-bold" : ""}`}
                 onClick={() => handleNavClick(aboutRef)}
               >
                 ABOUT
-                {activeSection === 'about' && <div className="lg:w-2 lg:h-2 bg-gray-900 rounded-full absolute mt-1 ml-5" />}
+                {activeSection === "about" && (
+                  <div className="lg:w-2 lg:h-2 bg-gray-900 rounded-full absolute mt-1 ml-5" />
+                )}
               </span>
-              <span 
-                className={`cursor-pointer ${activeSection === 'project' ? 'font-bold' : ''}`}
+              <span
+                className={`cursor-pointer ${activeSection === "project" ? "font-bold" : ""}`}
                 onClick={() => handleNavClick(projectRef)}
               >
                 PROJECT
-                {activeSection === 'project' && <div className="lg:w-2 lg:h-2 bg-gray-900 rounded-full absolute mt-1 ml-5" />}
+                {activeSection === "project" && (
+                  <div className="lg:w-2 lg:h-2 bg-gray-900 rounded-full absolute mt-1 ml-5" />
+                )}
               </span>
-              <span 
-                className={` cursor-pointer ${activeSection === 'contact' ? 'font-bold' : ''} lg:hidden`}
+              <span
+                className={` cursor-pointer ${activeSection === "contact" ? "font-bold" : ""} lg:hidden`}
                 onClick={() => navigate("/contact")}
               >
                 CONTACT
-                {activeSection === 'contact' && <div className="lg:w-2 lg:h-2 bg-gray-900 rounded-full absolute mt-1 ml-5" />}
+                {activeSection === "contact" && (
+                  <div className="lg:w-2 lg:h-2 bg-gray-900 rounded-full absolute mt-1 ml-5" />
+                )}
               </span>
             </div>
           </div>
           <div className="hidden lg:block">
-            <span className={` text-gray-900 cursor-pointer`} onClick={() => navigate("/contact")}>CONTACT</span>
+            <span
+              className={` text-gray-900 cursor-pointer`}
+              onClick={() => navigate("/contact")}
+            >
+              CONTACT
+            </span>
           </div>
         </div>
       </div>
     </nav>
-  )
+  );
 }

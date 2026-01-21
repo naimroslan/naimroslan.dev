@@ -1,4 +1,3 @@
-import type { MetaFunction } from "@remix-run/node";
 import { useEffect, useRef } from "react";
 import Typed from "typed.js";
 
@@ -16,33 +15,34 @@ import { DiNodejs } from "react-icons/di";
 
 import Navbar from "~/components/navbar";
 import Project from "~/components/projects/project";
-import naimroslan from "~/assets/naimroslan.png";
-import { useNavigate } from "@remix-run/react";
 
-export const meta: MetaFunction = () => {
-  return [{ title: "naimroslan" }];
-};
+export const meta = () => [{ title: "naimroslan" }];
 
 export default function Index() {
-  const skills = useRef(null);
+  const skills = useRef<HTMLSpanElement>(null);
 
-  const homeRef = useRef(null);
-  const aboutRef = useRef(null);
-  const projectRef = useRef(null);
+  const homeRef = useRef<HTMLDivElement>(null);
+  const aboutRef = useRef<HTMLDivElement>(null);
+  const projectRef = useRef<HTMLDivElement>(null);
+  const skillStrings = useRef<string[]>([
+    "TypeScript",
+    "JavaScript",
+    "React Router",
+    "React Native",
+    "Kotlin/Java",
+    "Node.js",
+    "Tailwind CSS",
+    "Docker",
+    "Figma",
+  ]);
 
   useEffect(() => {
+    if (!skills.current) {
+      return;
+    }
+
     const typed = new Typed(skills.current, {
-      strings: [
-        "Remix JS",
-        "JavaScript",
-        "TypeScript",
-        "React Native",
-        "Kotlin/Java",
-        "Node.js",
-        "Tailwind CSS",
-        "Docker",
-        "Figma",
-      ],
+      strings: skillStrings.current,
       typeSpeed: 80,
     });
 
@@ -62,18 +62,18 @@ export default function Index() {
       <div className="flex flex-col">
         <div className="flex flex-row">
           <div className="flex flex-col">
-            <div className="animate-slidein [--slidein-delay:300ms] opacity-0 text-4xl lg:text-8xl font-medium">
+            <div className="animate-slidein [--slidein-delay:300ms] text-4xl lg:text-8xl font-medium">
               HI, I'M
               <br />
               NAIM ROSLAN
             </div>
-            <div className="animate-slidein [--slidein-delay:500ms] opacity-0 text-xl lg:text-2xl font-medium">
+            <div className="animate-slidein [--slidein-delay:500ms] text-xl lg:text-2xl font-medium">
               I'm a software engineer. I can do <span ref={skills} />
             </div>
           </div>
         </div>
         <div className="flex justify-end">
-          <div className="animate-slidein [--slidein-delay:700ms] opacity-0 flex flex-row mt-64">
+          <div className="animate-slidein [--slidein-delay:700ms] flex flex-row mt-64">
             <div className="w-48 border-t border-gray-400 mx-4 mt-4"></div>
             <div className="cursor-pointer" onClick={handleGithubClick}>
               <SiGithub size={30} title="Check out my Github profile!" />
@@ -82,7 +82,7 @@ export default function Index() {
         </div>
         <div ref={aboutRef}>
           <div className="flex flex-col space-y-4 lg:space-y-0 lg:flex-row justify-between mt-36">
-            <div className="animate-slidein [--slidein-delay:300ms] opacity-0 font-medium text-xl">
+            <div className="animate-slidein [--slidein-delay:300ms] font-medium text-xl">
               ABOUT
             </div>
             <div className="flex flex-col space-y-4">
@@ -99,9 +99,8 @@ export default function Index() {
               <div className="text-lg">
                 Take a look at my stack
                 <div className="flex flex-row space-x-4 mt-2">
-                  <SiRemix size={20} title="Remix JS" />
-                  <SiJavascript size={20} title="JavaScript" />
                   <SiTypescript size={20} title="TypeScript" />
+                  <SiJavascript size={20} title="JavaScript" />
                   <SiKotlin size={20} title="Kotlin" />
                   <DiNodejs className="-mt-5" size={60} title="Node.js" />
                   <SiTailwindcss size={20} title="Tailwind CSS" />

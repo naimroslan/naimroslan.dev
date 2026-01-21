@@ -5,21 +5,22 @@
   "scripts": {
     "build": "react-router build",
     "dev": "react-router dev",
-    "start": "react-router-serve ./build/server/index.js",
-    "typecheck": "react-router typegen && tsc"
+    "preview": "pnpm run build && vite preview",
+    "deploy": "pnpm run build && wrangler deploy",
+    "typegen": "wrangler types && react-router typegen",
+    "typecheck": "pnpm run typegen && tsc"
   },
   "dependencies": {
-    "@react-router/node": "7.12.0",
-    "@react-router/serve": "7.12.0",
+    "@fullpage/react-fullpage": "^0.1.42",
     "isbot": "^5.1.31",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
-    "react-router": "7.12.0",
-    "@fullpage/react-fullpage": "^0.1.42",
     "react-icons": "^5.2.1",
+    "react-router": "7.12.0",
     "typed.js": "^2.1.0"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.21.1",
     "@react-router/dev": "7.12.0",
     "@tailwindcss/vite": "^4.1.13",
     "@types/node": "^22",
@@ -29,7 +30,6 @@
     "typescript": "^5.9.2",
     "vite": "^7.1.7",
     "vite-tsconfig-paths": "^5.1.4",
-    "@cloudflare/workers-types": "^4.20240712.0",
-    "wrangler": "^3.63.2"
+    "wrangler": "^4.59.3"
   }
 }

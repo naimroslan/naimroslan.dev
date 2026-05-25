@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
 import { useEffect, useState, type RefObject } from "react";
-import { HiOutlineMenuAlt3 } from "react-icons/hi";
+import { HiSun, HiMoon } from "react-icons/hi";
 
 type SectionRefs = {
   homeRef: RefObject<HTMLDivElement>;
@@ -11,11 +11,12 @@ type SectionRefs = {
 export default function Navbar({ homeRef, aboutRef, projectRef }: SectionRefs) {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<string>("home");
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // function to toggle the visibility of the dropdown meny
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
+  const toggleTheme = () => {
+    const isDark = document.documentElement.classList.toggle("dark");
+    try {
+      localStorage.setItem("theme", isDark ? "dark" : "light");
+    } catch {}
   };
 
   useEffect(() => {
@@ -43,75 +44,47 @@ export default function Navbar({ homeRef, aboutRef, projectRef }: SectionRefs) {
       ref.current.scrollIntoView({
         behavior: "smooth",
       });
-
-      setIsMenuOpen(false);
     }
   };
 
   return (
-    <nav className="sticky top-2 z-10 bg-white/30 backdrop-blur-md border border-gray-200/60 rounded-full shadow-sm">
-      <div className="max-w-5xl mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+    <nav className="bg-transparent">
+      <div className="max-w-5xl mx-auto">
+        <div className="flex items-stretch h-16 divide-x divide-fg">
           <span
-            className="text-2xl text-gray-900 font-semibold cursor-pointer"
+            className="flex flex-1 items-center px-3 lg:px-6 text-xl lg:text-2xl text-fg font-semibold cursor-pointer"
             onClick={() => handleNavClick(homeRef)}
           >
-            naimroslan.
+            <span className="lg:hidden">n.</span>
+            <span className="hidden lg:inline">naimroslan.</span>
           </span>
-          <div className="flex flex-col relative">
-            <div className="lg:hidden relative" onClick={toggleMenu}>
-              <HiOutlineMenuAlt3 />
-            </div>
-            {/* Dropdown menu */}
-            <div
-              className={`${isMenuOpen ? "absolute top-full right-0 flex flex-col mt-4 text-right" : "hidden"} lg:flex flex-row space-x-4 text-gray-900`}
-            >
-              <span
-                className={`ml-4 cursor-pointer ${activeSection === "home" ? "font-bold" : ""}`}
-                onClick={() => handleNavClick(homeRef)}
-              >
-                HOME
-                {activeSection === "home" && (
-                  <div className="lg:w-2 lg:h-2 bg-gray-900 rounded-full absolute mt-1 ml-5" />
-                )}
-              </span>
-              <span
-                className={`cursor-pointer ${activeSection === "about" ? "font-bold" : ""}`}
-                onClick={() => handleNavClick(aboutRef)}
-              >
-                ABOUT
-                {activeSection === "about" && (
-                  <div className="lg:w-2 lg:h-2 bg-gray-900 rounded-full absolute mt-1 ml-5" />
-                )}
-              </span>
-              <span
-                className={`cursor-pointer ${activeSection === "project" ? "font-bold" : ""}`}
-                onClick={() => handleNavClick(projectRef)}
-              >
-                PROJECT
-                {activeSection === "project" && (
-                  <div className="lg:w-2 lg:h-2 bg-gray-900 rounded-full absolute mt-1 ml-5" />
-                )}
-              </span>
-              <span
-                className={` cursor-pointer ${activeSection === "contact" ? "font-bold" : ""} lg:hidden`}
-                onClick={() => navigate("/contact")}
-              >
-                CONTACT
-                {activeSection === "contact" && (
-                  <div className="lg:w-2 lg:h-2 bg-gray-900 rounded-full absolute mt-1 ml-5" />
-                )}
-              </span>
-            </div>
-          </div>
-          <div className="hidden lg:block">
-            <span
-              className={` text-gray-900 cursor-pointer`}
-              onClick={() => navigate("/contact")}
-            >
-              CONTACT
-            </span>
-          </div>
+          <span
+            className={`flex items-center px-3 lg:px-6 text-fg cursor-pointer ${activeSection === "about" ? "font-bold" : ""}`}
+            onClick={() => handleNavClick(aboutRef)}
+          >
+            ABOUT
+          </span>
+          <span
+            className={`flex items-center px-3 lg:px-6 text-fg cursor-pointer ${activeSection === "project" ? "font-bold" : ""}`}
+            onClick={() => handleNavClick(projectRef)}
+          >
+            PROJECT
+          </span>
+          <span
+            className="flex items-center px-3 lg:px-6 text-fg cursor-pointer"
+            onClick={() => navigate("/contact")}
+          >
+            CONTACT
+          </span>
+          <button
+            type="button"
+            className="flex items-center px-3 lg:px-4 text-fg cursor-pointer focus-visible:outline focus-visible:outline-1 focus-visible:outline-fg focus-visible:outline-offset-[-4px]"
+            onClick={toggleTheme}
+            aria-label="Toggle theme"
+          >
+            <HiSun className="hidden dark:block" />
+            <HiMoon className="block dark:hidden" />
+          </button>
         </div>
       </div>
     </nav>

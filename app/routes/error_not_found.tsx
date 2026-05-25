@@ -25,7 +25,7 @@ export default function ErrorNotFound() {
         </div>
         <div className="mt-4">
           <button
-            className="py-4 px-8 bg-black rounded-lg text-white cursor-pointer"
+            className="py-4 px-8 border border-fg bg-transparent text-fg cursor-pointer transition-colors duration-200 hover:bg-fg hover:text-fg-invert focus-visible:outline focus-visible:outline-1 focus-visible:outline-fg focus-visible:outline-offset-4"
             onClick={() => navigate("/")}
           >
             Let's go home

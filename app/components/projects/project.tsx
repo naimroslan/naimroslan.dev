@@ -8,10 +8,10 @@ export default function Project({ title, description, link}: any) {
   }
 
   return (
-    <div className="h-auto">
-      <div 
-        className="text-white text-justify space-y-2 py-6 px-10 shadow-lg rounded-lg bg-[#000000] max-w-[500px] cursor-pointer"
-        onClick={handleProjectOnClick}      
+    <div className="h-full">
+      <div
+        className="h-full text-fg text-justify space-y-3 px-10 py-12 bg-transparent cursor-pointer transition-colors duration-200 hover:bg-fg hover:text-fg-invert"
+        onClick={handleProjectOnClick}
       >
         <div className="text-lg font-medium">
           {title}

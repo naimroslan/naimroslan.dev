@@ -49,8 +49,7 @@ export default function Navbar({ homeRef, aboutRef, projectRef }: SectionRefs) {
 
   return (
     <nav className="bg-transparent">
-      <div className="max-w-5xl mx-auto">
-        <div className="flex items-stretch h-16 divide-x divide-fg">
+      <div className="flex items-stretch h-16 divide-x divide-fg">
           <span
             className="flex flex-1 items-center px-3 lg:px-6 text-xl lg:text-2xl text-fg font-semibold cursor-pointer"
             onClick={() => handleNavClick(homeRef)}
@@ -85,7 +84,6 @@ export default function Navbar({ homeRef, aboutRef, projectRef }: SectionRefs) {
             <HiSun className="hidden dark:block" />
             <HiMoon className="block dark:hidden" />
           </button>
-        </div>
       </div>
     </nav>
   );

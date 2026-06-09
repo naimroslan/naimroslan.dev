@@ -1,5 +1,5 @@
 
-export default function Project({ title, description, link}: any) {
+export default function Project({ title, description, link, className }: any) {
 
   const handleProjectOnClick = () => {
     if (link) {
@@ -8,7 +8,7 @@ export default function Project({ title, description, link}: any) {
   }
 
   return (
-    <div className="h-full">
+    <div className={`h-full ${className ?? ""}`}>
       <div
         className="h-full text-fg text-justify space-y-3 px-10 py-12 bg-transparent cursor-pointer transition-colors duration-200 hover:bg-fg hover:text-fg-invert"
         onClick={handleProjectOnClick}

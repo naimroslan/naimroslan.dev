@@ -3,9 +3,9 @@ import { useEffect, useState, type RefObject } from "react";
 import { HiSun, HiMoon } from "react-icons/hi";
 
 type SectionRefs = {
-  homeRef: RefObject<HTMLDivElement>;
-  aboutRef: RefObject<HTMLDivElement>;
-  projectRef: RefObject<HTMLDivElement>;
+  homeRef: RefObject<HTMLDivElement | null>;
+  aboutRef: RefObject<HTMLDivElement | null>;
+  projectRef: RefObject<HTMLDivElement | null>;
 };
 
 export default function Navbar({ homeRef, aboutRef, projectRef }: SectionRefs) {
@@ -39,7 +39,7 @@ export default function Navbar({ homeRef, aboutRef, projectRef }: SectionRefs) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [homeRef, aboutRef, projectRef]);
 
-  const handleNavClick = (ref: RefObject<HTMLDivElement>) => {
+  const handleNavClick = (ref: RefObject<HTMLDivElement | null>) => {
     if (ref.current) {
       ref.current.scrollIntoView({
         behavior: "smooth",

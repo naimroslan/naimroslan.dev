@@ -69,7 +69,8 @@ export default function Index() {
               NAIM ROSLAN
             </div>
             <div className="animate-slidein [--slidein-delay:500ms] mt-6 text-xl lg:text-2xl font-medium">
-              I'm a software engineer. <br className="lg:hidden" />I can do <span ref={skills} />
+              I'm a software engineer. <br className="lg:hidden" />I can do{" "}
+              <span ref={skills} />
             </div>
             <div className="flex justify-end mt-32 lg:mt-48">
               <div className="animate-slidein [--slidein-delay:700ms] flex flex-row items-center">
@@ -91,14 +92,14 @@ export default function Index() {
           </div>
           <div className="lg:col-span-3 px-10 py-12 flex flex-col space-y-6">
             <div className="text-lg text-justify">
-              Hey there! I'm a frontend developer who loves finding cool ways
-              to make stuff look awesome and work even better. Lately, I've
-              been getting into backend development too, playing around with
-              things like Node.js and PostgreSQL. It's been a wild ride, but
-              super fun! I'm figuring out all this new stuff like message
-              queues and ORM integration, which keeps me on my toes. But hey,
-              every line of code is a chance to create something rad that gets
-              people stoked. Let's make some magic happen!
+              Hey there! I'm a frontend developer who loves finding cool ways to
+              make stuff look awesome and work even better. Lately, I've been
+              getting into backend development too, playing around with things
+              like Node.js and PostgreSQL. It's been a wild ride, but super fun!
+              I'm figuring out all this new stuff like message queues and ORM
+              integration, which keeps me on my toes. But hey, every line of
+              code is a chance to create something rad that gets people stoked.
+              Let's make some magic happen!
             </div>
             <div className="text-lg">
               Take a look at my stack
@@ -119,11 +120,12 @@ export default function Index() {
           PROJECT
         </section>
 
-        <section className="grid grid-cols-1 lg:grid-cols-2 divide-y divide-fg lg:divide-y-0 lg:divide-x lg:divide-fg">
+        <section className="grid grid-cols-1 lg:grid-cols-2">
           <Project
-            title="makanmana"
-            description="makanmana is a web app designed to help people — especially workers around Titiwangsa — decide where to eat. If you're feeling indecisive, just roll the dice and let fate decide your next meal!"
-            link="https://makanmana.naimroslan.dev"
+            title="tofu"
+            description="tofu is a disposable camera for the people in the room. A host creates an event, guests join through a short link, and everyone contributes a limited number of shots that all land in one shared gallery — photos and short videos included. No more chasing friends for that one group photo after the night ends."
+            link="https://tofu.naimroslan.dev"
+            className="lg:border-r border-fg"
           />
           <Project
             title="Dosa Aksara"
@@ -134,6 +136,7 @@ export default function Index() {
             We used to use Google Forms for this, but I felt like it was missing a lot
             of features, like proper filtering. So I decided to make my own thing."
             link="https://dosa-aksara.naimroslan.dev"
+            className="border-b border-fg"
           />
         </section>
       </div>

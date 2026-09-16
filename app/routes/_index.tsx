@@ -122,7 +122,7 @@ export default function Index() {
 
         <section className="grid grid-cols-1 lg:grid-cols-2">
           <Project
-            title="tofu"
+            title="withtofu"
             description="tofu is a disposable camera for the people in the room. A host creates an event, guests join through a short link, and everyone contributes a limited number of shots that all land in one shared gallery — photos and short videos included. No more chasing friends for that one group photo after the night ends."
             link="https://withtofu.app"
             className="border-b border-fg/30 lg:border-r"

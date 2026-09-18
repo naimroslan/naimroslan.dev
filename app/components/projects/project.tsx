@@ -1,25 +1,36 @@
+import { HiArrowUpRight } from "react-icons/hi2";
 
-export default function Project({ title, description, link, className }: any) {
+import type { ContentItem } from "~/data/content";
 
-  const handleProjectOnClick = () => {
-    if (link) {
-      window.open(`${link}`, '_blank')
-    }
+export default function Project({ title, body, link }: ContentItem) {
+  const content = (
+    <>
+      <div className="flex items-start justify-between gap-3">
+        <h3 className="text-lg font-medium">{title}</h3>
+        {link && (
+          <HiArrowUpRight
+            className="mt-1 shrink-0 text-muted transition-colors group-hover:text-accent"
+            aria-hidden="true"
+          />
+        )}
+      </div>
+      <p className="mt-3 text-sm leading-relaxed text-muted">{body}</p>
+    </>
+  );
+
+  // A project without a link is still worth showing — it just isn't clickable.
+  if (!link) {
+    return <div className="card p-6">{content}</div>;
   }
 
   return (
-    <div className={`h-full ${className ?? ""}`}>
-      <div
-        className="h-full text-fg text-justify space-y-3 px-10 py-12 bg-transparent cursor-pointer transition-colors duration-200 hover:bg-fg hover:text-fg-invert"
-        onClick={handleProjectOnClick}
-      >
-        <div className="text-lg font-medium">
-          {title}
-        </div>
-        <div>
-          {description}
-        </div>
-      </div>
-    </div>
-  )
+    <a
+      href={link}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="card card-interactive group block p-6"
+    >
+      {content}
+    </a>
+  );
 }

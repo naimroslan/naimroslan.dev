@@ -7,34 +7,104 @@
         "Space Grotesk", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
         "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 
+    --color-page: var(--page);
+    --color-surface: var(--surface);
     --color-fg: var(--fg);
     --color-fg-invert: var(--fg-invert);
+    --color-muted: var(--muted);
+    --color-line: var(--line);
+    --color-accent: var(--accent);
 }
 
+/* Light is the default theme; `.dark` on <html> opts in to the dark palette. */
 :root {
-    --fg: #000000;
-    --fg-invert: #ffffff;
+    --page: #faf9f7;
+    --surface: #ffffff;
+    --fg: #17181b;
+    --fg-invert: #faf9f7;
+    --muted: #6b6f76;
+    --line: #e5e3df;
+    --accent: #7d2b35;
+
+    --dot: rgba(23, 24, 27, 0.08);
+    --dot-size: 22px;
+
+    color-scheme: light;
+
+    --card-shadow: 0 1px 2px rgba(23, 24, 27, 0.04), 0 10px 28px -14px rgba(23, 24, 27, 0.14);
+    --card-shadow-lift: 0 2px 4px rgba(23, 24, 27, 0.05), 0 18px 44px -18px rgba(23, 24, 27, 0.22);
 }
 
 html.dark {
-    --fg: #ffffff;
-    --fg-invert: #000000;
+    --page: #0e0f12;
+    --surface: #17191e;
+    --fg: #f2f1ee;
+    --fg-invert: #0e0f12;
+    --muted: #9a9ea6;
+    --line: #272b33;
+    --accent: #cf7280;
+
+    --dot: rgba(242, 241, 238, 0.09);
+    --dot-size: 26px;
+
+    color-scheme: dark;
+
+    --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px -14px rgba(0, 0, 0, 0.6);
+    --card-shadow-lift: 0 2px 6px rgba(0, 0, 0, 0.5), 0 18px 44px -18px rgba(0, 0, 0, 0.75);
+}
+
+html {
+    /* Offsets in-page anchor jumps so the sticky navbar never covers a heading. */
+    scroll-padding-top: 5rem;
 }
 
 html,
 body {
     min-height: 100vh;
     color: var(--fg);
-    background-color: #ffffff;
-    background-image: radial-gradient(circle at 1px 1px, rgba(0, 0, 0, 0.35) 1px, transparent 0);
-    background-size: 20px 20px;
+    background-color: var(--page);
+    background-image: radial-gradient(circle at 1px 1px, var(--dot) 1px, transparent 0);
+    background-size: var(--dot-size) var(--dot-size);
 }
 
-html.dark,
-html.dark body {
-    background-color: #000000;
-    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.2) 1.5px, transparent 1.5px);
-    background-size: 30px 30px;
+@media (prefers-reduced-motion: no-preference) {
+    html {
+        scroll-behavior: smooth;
+    }
+}
+
+@layer components {
+    /* Soft card used by project tiles. Kept here so the dark-mode shadow
+       swap lives in one place rather than on every consumer. */
+    .card {
+        background-color: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 1rem;
+        box-shadow: var(--card-shadow);
+        transition:
+            box-shadow 0.25s ease,
+            transform 0.25s ease,
+            border-color 0.25s ease;
+    }
+
+    .card-interactive:hover {
+        box-shadow: var(--card-shadow-lift);
+        transform: translateY(-2px);
+        border-color: color-mix(in oklab, var(--accent) 35%, var(--line));
+    }
+
+    .card-interactive:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .card,
+        .card-interactive:hover {
+            transition: none;
+            transform: none;
+        }
+    }
 }
 
 @layer utilities {

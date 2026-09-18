@@ -1,90 +1,112 @@
-import { useNavigate } from "react-router";
-import { useEffect, useState, type RefObject } from "react";
-import { HiSun, HiMoon } from "react-icons/hi";
+import { useEffect, useState } from "react";
+import { HiOutlineMoon, HiOutlineSun } from "react-icons/hi2";
 
-type SectionRefs = {
-  homeRef: RefObject<HTMLDivElement | null>;
-  aboutRef: RefObject<HTMLDivElement | null>;
-  projectRef: RefObject<HTMLDivElement | null>;
-};
+const NAV_ITEMS = [
+  { id: "about", label: "ABOUT" },
+  { id: "projects", label: "PROJECTS" },
+  { id: "contact", label: "CONTACT" },
+] as const;
 
-export default function Navbar({ homeRef, aboutRef, projectRef }: SectionRefs) {
-  const navigate = useNavigate();
-  const [activeSection, setActiveSection] = useState<string>("home");
+/**
+ * A section becomes "current" once its top edge crosses this fraction of the
+ * viewport, so the nav updates as content reaches reading position rather than
+ * the instant a section's edge appears.
+ */
+const ACTIVATION_LINE_RATIO = 0.35;
+/** Slack for fractional device pixels when testing for end-of-document. */
+const BOTTOM_TOLERANCE_PX = 2;
 
-  const toggleTheme = () => {
-    const isDark = document.documentElement.classList.toggle("dark");
-    try {
-      localStorage.setItem("theme", isDark ? "dark" : "light");
-    } catch {}
-  };
+export interface NavbarProps {
+  onToggleTheme: () => void;
+}
+
+export default function Navbar({ onToggleTheme }: NavbarProps) {
+  const [activeSection, setActiveSection] = useState<string | null>(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const homePosition = homeRef.current?.getBoundingClientRect().top || 0;
-      const aboutPosition = aboutRef.current?.getBoundingClientRect().top || 0;
-      const projectPosition =
-        projectRef.current?.getBoundingClientRect().top || 0;
+    const sections = NAV_ITEMS.map(({ id }) => document.getElementById(id)).filter(
+      (element): element is HTMLElement => element !== null,
+    );
+    const lastSection = sections.at(-1);
+    if (!lastSection) return;
 
-      if (homePosition >= 0 && homePosition < window.innerHeight) {
-        setActiveSection("home");
-      } else if (aboutPosition >= 0 && aboutPosition < window.innerHeight) {
-        setActiveSection("about");
-      } else if (projectPosition >= 0 && projectPosition < window.innerHeight) {
-        setActiveSection("project");
+    const resolveActive = () => {
+      const activationLine = window.innerHeight * ACTIVATION_LINE_RATIO;
+
+      // The last section to have crossed the line wins, so scrolling down
+      // hands off cleanly instead of the earliest match sticking.
+      let current: string | null = null;
+      for (const section of sections) {
+        if (section.getBoundingClientRect().top <= activationLine) current = section.id;
       }
+
+      // A short final section can never reach the activation line once the
+      // page has bottomed out, so end-of-document always means the last one.
+      const scrolledToBottom =
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - BOTTOM_TOLERANCE_PX;
+      setActiveSection(scrolledToBottom ? lastSection.id : current);
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [homeRef, aboutRef, projectRef]);
-
-  const handleNavClick = (ref: RefObject<HTMLDivElement | null>) => {
-    if (ref.current) {
-      ref.current.scrollIntoView({
-        behavior: "smooth",
+    // Coalesced into one measurement per frame, so the three reads never run
+    // more than once per paint however fast the scroll events arrive.
+    let frameId = 0;
+    const onScroll = () => {
+      if (frameId !== 0) return;
+      frameId = requestAnimationFrame(() => {
+        frameId = 0;
+        resolveActive();
       });
-    }
-  };
+    };
+
+    resolveActive();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+
+    return () => {
+      if (frameId !== 0) cancelAnimationFrame(frameId);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
 
   return (
-    <nav className="bg-transparent">
-      <div className="flex items-stretch h-16 divide-x divide-fg">
-          <span
-            className="flex flex-1 items-center px-3 lg:px-6 text-xl lg:text-2xl text-fg font-semibold cursor-pointer"
-            onClick={() => handleNavClick(homeRef)}
+    <header className="sticky top-0 z-50 border-b border-line bg-page/80 backdrop-blur-md">
+      <nav
+        aria-label="Main"
+        className="mx-auto flex h-16 max-w-6xl items-center gap-0.5 px-6 lg:gap-1 lg:px-10"
+      >
+        <a
+          href="#top"
+          className="mr-auto text-lg font-semibold tracking-tight lg:text-xl"
+        >
+          <span className="lg:hidden">n.</span>
+          <span className="hidden lg:inline">naimroslan.</span>
+        </a>
+
+        {NAV_ITEMS.map(({ id, label }) => (
+          <a
+            key={id}
+            href={`#${id}`}
+            aria-current={activeSection === id ? "true" : undefined}
+            className={`rounded-full px-2.5 py-2 text-xs font-medium tracking-[0.12em] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent lg:px-3 lg:text-sm ${
+              activeSection === id ? "text-accent" : "text-muted hover:text-fg"
+            }`}
           >
-            <span className="lg:hidden">n.</span>
-            <span className="hidden lg:inline">naimroslan.</span>
-          </span>
-          <span
-            className={`flex items-center px-3 lg:px-6 text-fg cursor-pointer ${activeSection === "about" ? "font-bold" : ""}`}
-            onClick={() => handleNavClick(aboutRef)}
-          >
-            ABOUT
-          </span>
-          <span
-            className={`flex items-center px-3 lg:px-6 text-fg cursor-pointer ${activeSection === "project" ? "font-bold" : ""}`}
-            onClick={() => handleNavClick(projectRef)}
-          >
-            PROJECT
-          </span>
-          <span
-            className="flex items-center px-3 lg:px-6 text-fg cursor-pointer"
-            onClick={() => navigate("/contact")}
-          >
-            CONTACT
-          </span>
-          <button
-            type="button"
-            className="flex items-center px-3 lg:px-4 text-fg cursor-pointer focus-visible:outline focus-visible:outline-1 focus-visible:outline-fg focus-visible:outline-offset-[-4px]"
-            onClick={toggleTheme}
-            aria-label="Toggle theme"
-          >
-            <HiSun className="hidden dark:block" />
-            <HiMoon className="block dark:hidden" />
-          </button>
-      </div>
-    </nav>
+            {label}
+          </a>
+        ))}
+
+        <button
+          type="button"
+          onClick={onToggleTheme}
+          aria-label="Toggle theme"
+          className="ml-1 flex size-9 cursor-pointer items-center justify-center rounded-full text-muted transition-colors hover:bg-fg/5 hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        >
+          <HiOutlineSun className="hidden dark:block" aria-hidden="true" />
+          <HiOutlineMoon className="block dark:hidden" aria-hidden="true" />
+        </button>
+      </nav>
+    </header>
   );
 }

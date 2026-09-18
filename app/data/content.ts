@@ -1,10 +1,10 @@
 // Content layer: markdown files in /content, imported as raw text at build time.
 // No runtime fetch, no DB. Edit a .md → rebuild → site updates.
 
-import aboutRaw from "../content/about.md?raw";
-import tofuRaw from "../content/projects/tofu.md?raw";
-import dosaRaw from "../content/projects/dosa-aksara.md?raw";
-import lazytikRaw from "../content/projects/lazytik.md?raw";
+import aboutRaw from "../../content/about.md?raw";
+import tofuRaw from "../../content/projects/tofu.md?raw";
+import dosaRaw from "../../content/projects/dosa-aksara.md?raw";
+import lazytikRaw from "../../content/projects/lazytik.md?raw";
 
 export interface ContentItem {
   title: string;
@@ -12,16 +12,23 @@ export interface ContentItem {
   link?: string;
 }
 
+const FRONTMATTER = /^---\s*\n([\s\S]*?)\n---\s*\n?([\s\S]*)$/;
+const SURROUNDING_QUOTES = /^["'](.*)["']$/;
+
+const unquote = (value: string) => value.replace(SURROUNDING_QUOTES, "$1");
+
 function parse(raw: string): ContentItem {
   // frontmatter: ---\n key: value \n---\n body
-  const m = raw.match(/^---\s*\n([\s\S]*?)\n---\s*\n?([\s\S]*)$/);
-  if (!m) return { title: "", body: raw };
-  const fm: Record<string, string> = {};
-  for (const line of m[1].split("\n")) {
-    const [k, ...v] = line.split(":");
-    if (k && v.length) fm[k.trim()] = v.join(":").trim();
+  const match = raw.match(FRONTMATTER);
+  if (!match) return { title: "", body: raw };
+
+  const fields: Record<string, string> = {};
+  for (const line of match[1].split("\n")) {
+    const [key, ...rest] = line.split(":");
+    if (key && rest.length) fields[key.trim()] = unquote(rest.join(":").trim());
   }
-  return { title: fm.title ?? "", body: m[2].trim(), link: fm.link };
+
+  return { title: fields.title ?? "", body: match[2].trim(), link: fields.link };
 }
 
 export const about = parse(aboutRaw);

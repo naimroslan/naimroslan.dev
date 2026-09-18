@@ -67,8 +67,8 @@ export default function Hero({ theme }: HeroProps) {
     <section className="mx-auto w-full max-w-6xl px-6 lg:px-10">
       <div className="grid items-center gap-6 pt-10 pb-6 lg:min-h-[calc(100vh-4rem)] lg:grid-cols-2 lg:gap-12 lg:py-0">
         <div className="flex flex-col">
-          <p className="animate-slidein [--slidein-delay:200ms] text-sm font-medium tracking-[0.2em] text-muted">
-            HI, I'M
+          <p className="animate-slidein [--slidein-delay:200ms] text-sm font-medium tracking-wide text-muted">
+            Hi, I'm
           </p>
           <h1 className="animate-slidein [--slidein-delay:300ms] mt-2 text-5xl leading-[0.95] font-semibold tracking-tight sm:text-6xl lg:text-7xl">
             NAIM
@@ -77,6 +77,10 @@ export default function Hero({ theme }: HeroProps) {
           </h1>
           <p className="animate-slidein [--slidein-delay:500ms] mt-6 max-w-md text-lg text-muted lg:text-xl">
             I'm a software engineer. I can do{" "}
+            {/* Fixed break, so the paragraph is always two lines. typed.js puts
+                its cursor in a sibling after this span, so making the span
+                block-level would push the cursor onto a third line instead. */}
+            <br />
             <span ref={skillsRef} className="font-medium text-fg" />
           </p>
           <a

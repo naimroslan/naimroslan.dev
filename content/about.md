@@ -1,11 +1,11 @@
 ---
 title: "About"
 ---
-Hey there! I'm a frontend developer who loves finding cool ways to
-make stuff look awesome and work even better. Lately, I've been
-getting into backend development too, playing around with things
-like Node.js and PostgreSQL. It's been a wild ride, but super fun!
-I'm figuring out all this new stuff like message queues and ORM
-integration, which keeps me on my toes. But hey, every line of
-code is a chance to create something rad that gets people stoked.
-Let's make some magic happen!
+Hey! I started out as a full-stack developer and moved into product
+engineering on purpose. Writing the code was never the hard part —
+deciding what deserved to be written was. These days that's usually a
+Python backend on one screen and a TypeScript frontend on the other.
+I build my own agent tooling too: skills that take the research, the
+scaffolding and the boring passes off my plate, so the time goes into
+decisions instead of typing. And yes, I will happily lose an evening
+to my keyboard layout.

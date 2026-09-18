@@ -1,9 +1,10 @@
 import {
+  SiClaude,
   SiDocker,
   SiFigma,
   SiJavascript,
-  SiKotlin,
   SiNodedotjs,
+  SiPython,
   SiTailwindcss,
   SiTypescript,
 } from "react-icons/si";
@@ -15,11 +16,12 @@ import Section from "./section";
 const STACK = [
   { Icon: SiTypescript, label: "TypeScript" },
   { Icon: SiJavascript, label: "JavaScript" },
-  { Icon: SiKotlin, label: "Kotlin" },
+  { Icon: SiPython, label: "Python" },
   { Icon: SiNodedotjs, label: "Node.js" },
   { Icon: SiTailwindcss, label: "Tailwind CSS" },
   { Icon: SiDocker, label: "Docker" },
   { Icon: SiFigma, label: "Figma" },
+  { Icon: SiClaude, label: "Claude Code" },
 ];
 
 const ICON_SIZE = 22;

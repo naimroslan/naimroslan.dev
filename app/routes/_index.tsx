@@ -33,7 +33,7 @@ export default function Index() {
       </main>
 
       <footer className="mx-auto w-full max-w-6xl px-6 pb-10 text-sm text-muted lg:px-10">
-        <div className="border-t border-line pt-6">© {YEAR} naimroslan</div>
+        <div className="border-t border-line pt-6">© {YEAR} naimroslan.dev</div>
       </footer>
     </>
   );

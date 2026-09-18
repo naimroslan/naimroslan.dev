@@ -8,6 +8,7 @@ import {
 } from "react-router";
 
 import type { Route } from "./+types/root";
+import { PAGE_COLOR } from "~/hooks/use-theme";
 import "./app.css";
 
 export const links: Route.LinksFunction = () => [
@@ -39,8 +40,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
-        <meta name="theme-color" content="#faf9f7" media="(prefers-color-scheme: light)" />
-        <meta name="theme-color" content="#0e0f12" media="(prefers-color-scheme: dark)" />
+        {/* No theme-color meta here on purpose. It has to track the `dark`
+            class rather than prefers-color-scheme, so the boot script below
+            owns it; leaving it out of the React tree is what stops hydration
+            from reverting what that script set. */}
         {/* iOS before 17.4 launches standalone from this meta, not the manifest. */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         {/* iOS labels a home screen icon from this, falling back to the page
@@ -48,10 +51,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
             label right when the site is added from /contact or a 404. */}
         <meta name="apple-mobile-web-app-title" content="naimroslan" />
         {/* Light is the default; only an explicit saved choice opts into dark.
-            Runs before paint so there is no flash of the wrong theme. */}
+            Runs before paint so there is no flash of the wrong theme, and it
+            sets the browser UI tint in the same pass so the iOS standalone
+            status bar matches the page instead of the OS preference. Lives in
+            Layout, so it covers every route, not just the one that calls
+            useTheme. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{if(localStorage.getItem('theme')==='dark'){document.documentElement.classList.add('dark');}}catch(e){}})();`,
+            __html: `(function(){var d=false;try{d=localStorage.getItem('theme')==='dark'}catch(e){}if(d)document.documentElement.classList.add('dark');var m=document.createElement('meta');m.setAttribute('name','theme-color');m.setAttribute('content',d?'${PAGE_COLOR.dark}':'${PAGE_COLOR.light}');document.head.appendChild(m)})();`,
           }}
         />
       </head>

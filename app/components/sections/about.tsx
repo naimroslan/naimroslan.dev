@@ -3,8 +3,11 @@ import {
   SiDocker,
   SiFigma,
   SiJavascript,
+  SiMailtrap,
   SiNodedotjs,
+  SiPostgresql,
   SiPython,
+  SiReactrouter,
   SiTailwindcss,
   SiTypescript,
 } from "react-icons/si";
@@ -13,12 +16,16 @@ import { about } from "~/data/content";
 
 import Section from "./section";
 
+/** Ordered languages, then framework and runtime, then data, service, tools. */
 const STACK = [
   { Icon: SiTypescript, label: "TypeScript" },
   { Icon: SiJavascript, label: "JavaScript" },
   { Icon: SiPython, label: "Python" },
+  { Icon: SiReactrouter, label: "React Router" },
   { Icon: SiNodedotjs, label: "Node.js" },
   { Icon: SiTailwindcss, label: "Tailwind CSS" },
+  { Icon: SiPostgresql, label: "Postgres" },
+  { Icon: SiMailtrap, label: "Mailtrap" },
   { Icon: SiDocker, label: "Docker" },
   { Icon: SiFigma, label: "Figma" },
   { Icon: SiClaude, label: "Claude Code" },

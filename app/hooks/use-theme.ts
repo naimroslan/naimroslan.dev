@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 export type Theme = "light" | "dark";
 
@@ -17,13 +17,12 @@ const readTheme = (): Theme =>
  * lights, and the navbar needs the setter.
  */
 export function useTheme() {
-  // Starts at the SSR default so the first client render matches the server
-  // markup; the effect below reconciles with whatever the boot script applied.
-  const [theme, setTheme] = useState<Theme>("light");
-
-  useEffect(() => {
-    setTheme(readTheme());
-  }, []);
+  // Read the DOM lazily on the client so a dark-mode visitor's hero never gets
+  // a frame of light-mode lighting; on the server there is no document, and the
+  // SSR default matches the boot script's no-preference branch.
+  const [theme, setTheme] = useState<Theme>(() =>
+    typeof document === "undefined" ? "light" : readTheme(),
+  );
 
   const toggle = useCallback(() => {
     const isDark = document.documentElement.classList.toggle("dark");

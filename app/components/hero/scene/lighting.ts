@@ -72,7 +72,7 @@ export function applyTheme(lights: SceneLights, theme: Theme): void {
 }
 
 const SHADOW_TEXTURE_SIZE = 128;
-const SHADOW_RADIUS = 0.95;
+const SHADOW_RADIUS = 1.05;
 
 function createShadowTexture(): CanvasTexture {
   const canvas = document.createElement("canvas");
@@ -83,9 +83,13 @@ function createShadowTexture(): CanvasTexture {
   if (context) {
     const half = SHADOW_TEXTURE_SIZE / 2;
     const gradient = context.createRadialGradient(half, half, 0, half, half, half);
-    gradient.addColorStop(0, "rgba(0, 0, 0, 1)");
-    gradient.addColorStop(0.55, "rgba(0, 0, 0, 0.45)");
-    gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
+    // White, not black: three's alpha-map chunk samples the GREEN channel
+    // (`diffuseColor.a *= texture2D( alphaMap, vAlphaMapUv ).g`), so a black
+    // gradient yields alpha 0 everywhere and the shadow never draws. The
+    // material's own `color` supplies the black.
+    gradient.addColorStop(0, "rgba(255, 255, 255, 1)");
+    gradient.addColorStop(0.55, "rgba(255, 255, 255, 0.45)");
+    gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
     context.fillStyle = gradient;
     context.fillRect(0, 0, SHADOW_TEXTURE_SIZE, SHADOW_TEXTURE_SIZE);
   }
@@ -110,8 +114,8 @@ export function createContactShadow(): { mesh: Mesh; dispose: () => void } {
 
   const mesh = new Mesh(new CircleGeometry(SHADOW_RADIUS, 24), material);
   mesh.rotation.x = -Math.PI / 2;
-  mesh.position.set(0, 0.002, -0.2);
-  mesh.scale.set(1, 0.8, 1);
+  mesh.position.set(0, 0.002, -0.12);
+  mesh.scale.set(1, 0.72, 1);
 
   return {
     mesh,

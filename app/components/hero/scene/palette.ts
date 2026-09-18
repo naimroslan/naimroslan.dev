@@ -1,52 +1,69 @@
-import { LineBasicMaterial, MeshBasicMaterial, MeshStandardMaterial } from "three";
-
-import type { Theme } from "~/hooks/use-theme";
+import { MeshBasicMaterial, MeshStandardMaterial } from "three";
 
 /**
- * Colours sampled from the reference photo (app/assets/naimroslan.png) and the
- * desk props. Kept mid-value on purpose: the page behind the canvas is
- * near-white in light mode, so a pale silhouette would wash out against it.
+ * Soft and muted, keyed to the site's own `--accent` (#7d2b35) so the diorama
+ * belongs to the page. Nothing here is brighter than ~#e8e3d6: with no contour
+ * lines, the silhouette against the #faf9f7 page is carried entirely by value
+ * contrast, so a near-white surface would dissolve into the background.
  */
 export const PALETTE = {
-  cap: 0x1c1f26,
-  skin: 0xc98f63,
-  skinShadow: 0xb37c53,
-  hood: 0x6e6b4e,
-  bomber: 0x7d2b35,
-  hoodie: 0x8e9299,
-  tee: 0xa33b46,
-  pants: 0x3c4657,
-  chair: 0x3a3f47,
+  // character
+  beanie: 0x343a45,
+  beanieCuff: 0x2b313a,
+  hoodie: 0x8f4550,
+  hoodieShade: 0x743b44,
+  hoodieHood: 0x7c3b45,
+  hoodiePocket: 0x843f4a,
+  drawstring: 0xd9d2c8,
+  skin: 0xc08a64,
+  skinShade: 0xa87253,
+  eye: 0x2b2118,
+  brow: 0x2f2620,
+  pants: 0x7a5b40,
+  pantsShade: 0x654a33,
+  sock: 0xe4ded1,
+  shoeSole: 0xe6e1d6,
+  shoeMid: 0xd2ccbf,
+  shoeUpper: 0xb8b3aa,
+  shoeAccent: 0x8a8f95,
+  shoeHeel: 0x6f6b64,
 
-  deskTop: 0xb98b5e,
-  deskLeg: 0x8a6742,
-  laptopBody: 0xb9bcc2,
-  laptopScreen: 0x2b303a,
+  // furniture
+  chair: 0x4a505a,
+  chairShade: 0x3b414a,
+  deskTop: 0xc0a183,
+  deskEdge: 0xa8886a,
+  deskLeg: 0x8d7157,
+
+  // hardware
+  monitorShell: 0x4e555f,
+  monitorBack: 0x585f6a,
+  monitorStand: 0x444a54,
+  biasLight: 0x7fb4e8,
+  laptopShell: 0xb9bec5,
+  laptopStand: 0x9aa0a8,
+  screen: 0x232935,
   screenGlow: 0x8fb7ff,
-  notebookCover: 0x33383f,
-  pages: 0xf2efe6,
-  noteLine: 0x5a6472,
+  keyboard: 0x2f353e,
+  keycap: 0xdad5cb,
+  trackpad: 0xd5d1c9,
+
+  // desk clutter
+  notebookCover: 0x33566b,
+  pages: 0xf0ece2,
+  noteLine: 0x8b93a0,
   penBody: 0x2f3440,
-  penAccent: 0xa33b46,
-  penBlue: 0x3d6b8f,
-  mug: 0xe8e3d8,
+  mug: 0xe3ded2,
   coffee: 0x4a2f22,
-  eye: 0x14161a,
+  sticky: 0xf0d271,
 } as const;
 
-/**
- * Bright contours on a dark page read much heavier than dark contours on a
- * light one, so dark mode uses a lower opacity rather than the same value.
- */
-const OUTLINE_THEME = {
-  light: { color: 0x24262b, opacity: 0.5 },
-  dark: { color: 0xf2f1ee, opacity: 0.22 },
-} as const;
-
-const DEFAULT_ROUGHNESS = 0.78;
+const DEFAULT_ROUGHNESS = 0.62;
 
 interface MaterialOverrides {
   roughness?: number;
+  emissive?: number;
+  emissiveIntensity?: number;
 }
 
 export interface MaterialLibrary {
@@ -57,9 +74,8 @@ export interface MaterialLibrary {
 }
 
 /**
- * Caches one material per colour/override combination. Two reasons: the
- * diorama reuses most colours across several meshes, and disposal then has a
- * single known set to walk instead of hunting for duplicates.
+ * Caches one material per colour/override combination. The diorama reuses most
+ * colours across many meshes, and disposal then has a single known set to walk.
  */
 export function createMaterialLibrary(): MaterialLibrary {
   const cache = new Map<string, MeshStandardMaterial>();
@@ -67,19 +83,18 @@ export function createMaterialLibrary(): MaterialLibrary {
 
   return {
     get(color, overrides = {}) {
-      const { roughness = DEFAULT_ROUGHNESS } = overrides;
-      const key = `${color}|${roughness}`;
+      const { roughness = DEFAULT_ROUGHNESS, emissive, emissiveIntensity = 1 } = overrides;
+      const key = `${color}|${roughness}|${emissive ?? "none"}|${emissiveIntensity}`;
 
       const cached = cache.get(key);
       if (cached) return cached;
 
-      const material = new MeshStandardMaterial({
-        color,
-        roughness,
-        metalness: 0,
-        // Flat shading is what gives the faceted low-poly read.
-        flatShading: true,
-      });
+      const material = new MeshStandardMaterial({ color, roughness, metalness: 0 });
+      if (emissive !== undefined) {
+        material.emissive.setHex(emissive);
+        material.emissiveIntensity = emissiveIntensity;
+      }
+
       cache.set(key, material);
       return material;
     },
@@ -100,13 +115,4 @@ export function createMaterialLibrary(): MaterialLibrary {
       unlitCache.clear();
     },
   };
-}
-
-export const createOutlineMaterial = (): LineBasicMaterial =>
-  new LineBasicMaterial({ transparent: true, toneMapped: false });
-
-export function applyOutlineTheme(material: LineBasicMaterial, theme: Theme): void {
-  const { color, opacity } = OUTLINE_THEME[theme];
-  material.color.setHex(color);
-  material.opacity = opacity;
 }

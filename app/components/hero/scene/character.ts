@@ -1,101 +1,170 @@
-import { Group, type Material } from "three";
+import { Group } from "three";
 
 import { PALETTE, type MaterialLibrary } from "./palette";
-import { box, connect, cylinder, outline, sphere } from "./primitives";
+import { box, cylinder, dome, limb, roundedBox, sphere, torus } from "./primitives";
 
 /**
- * Seated, facing +z (the camera's home position). The desk module shares this
- * frame: y = 0 is the floor and the desk surface sits at DESK_SURFACE_Y.
+ * Seated, facing +z (the camera's home position). Proportions are stylised
+ * rather than anatomical — the head is deliberately oversized, which is both
+ * the reference style and what lifts the face clear of the monitor.
  */
 const BODY_Z = -0.62;
-const SHOULDER_Y = 0.96;
-const HAND_Y = 0.81;
+const HEAD_Y = 1.28;
+const HEAD_RADIUS = 0.16;
 /** Just proud of the head's front surface, so face details sit on it. */
-const FACE_Z = BODY_Z + 0.126;
+const FACE_Z = BODY_Z + HEAD_RADIUS * 0.9;
 
-const UPPER_ARM_RADIUS = 0.052;
-const FOREARM_RADIUS = 0.045;
-const HAND_RADIUS = 0.05;
+const SHOULDER_Y = 0.99;
+const HAND_Y = 0.82;
+/** Matches the split keyboard halves in desk.ts. */
+const KEYBOARD_X = 0.17;
+const KEYBOARD_Z = -0.16;
 
-export function createCharacter(materials: MaterialLibrary, contour: Material): Group {
+const ARM_RADIUS = 0.055;
+const PANT_CUFF_Y = 0.17;
+const SOCK_TOP_Y = 0.175;
+const SHOE_FLOOR_Y = 0.003;
+
+function addHead(character: Group, materials: MaterialLibrary): void {
+  const skin = materials.get(PALETTE.skin);
+
+  character.add(
+    cylinder(0.058, 0.066, 0.1, materials.get(PALETTE.skinShade), [0, 1.12, BODY_Z]),
+    sphere(HEAD_RADIUS, skin, [0, HEAD_Y, BODY_Z], [1, 1.04, 0.94]),
+    sphere(0.03, skin, [-0.152, HEAD_Y - 0.01, BODY_Z]),
+    sphere(0.03, skin, [0.152, HEAD_Y - 0.01, BODY_Z]),
+  );
+
+  // Minimal features, per the reference: eyes carry it, everything else is a hint.
+  const iris = materials.unlit(PALETTE.eye);
+  const brow = materials.get(PALETTE.brow);
+  character.add(
+    sphere(0.019, iris, [-0.058, HEAD_Y - 0.005, FACE_Z], [1, 1.15, 0.6]),
+    sphere(0.019, iris, [0.058, HEAD_Y - 0.005, FACE_Z], [1, 1.15, 0.6]),
+    roundedBox([0.042, 0.011, 0.012], 0.005, brow, [-0.058, HEAD_Y + 0.036, FACE_Z]),
+    roundedBox([0.042, 0.011, 0.012], 0.005, brow, [0.058, HEAD_Y + 0.036, FACE_Z]),
+    sphere(0.018, materials.get(PALETTE.skinShade), [0, HEAD_Y - 0.042, FACE_Z], [0.8, 1, 0.8]),
+  );
+
+  // Beanie: dome plus a thick folded cuff sitting at the brow line.
+  character.add(
+    dome(HEAD_RADIUS + 0.012, materials.get(PALETTE.beanie), [0, HEAD_Y + 0.028, BODY_Z], [1, 1.0, 0.96]),
+    cylinder(
+      HEAD_RADIUS + 0.02,
+      HEAD_RADIUS + 0.022,
+      0.062,
+      materials.get(PALETTE.beanieCuff),
+      [0, HEAD_Y + 0.048, BODY_Z],
+    ),
+  );
+}
+
+function addHoodie(character: Group, materials: MaterialLibrary): void {
+  const hoodie = materials.get(PALETTE.hoodie);
+
+  // Torso as a single capsule, flattened front-to-back.
+  const torso = limb([0, 0.62, BODY_Z], [0, 1.0, BODY_Z], 0.215, hoodie);
+  torso.scale.set(1, 1, 0.84);
+  character.add(torso);
+
+  // Shoulders, sleeves, cuffs and hands: both hands land on the keyboard halves.
+  const cuff = materials.get(PALETTE.hoodieShade);
+  const skin = materials.get(PALETTE.skin);
+  for (const side of [-1, 1]) {
+    const shoulderX = side * 0.2;
+    const elbowX = side * 0.255;
+    const handX = side * KEYBOARD_X;
+
+    character.add(
+      sphere(0.088, hoodie, [shoulderX, SHOULDER_Y - 0.03, BODY_Z], [1, 1, 0.9]),
+      limb([shoulderX, SHOULDER_Y - 0.02, BODY_Z], [elbowX, 0.82, BODY_Z + 0.1], ARM_RADIUS, hoodie),
+      limb([elbowX, 0.82, BODY_Z + 0.1], [handX, HAND_Y, KEYBOARD_Z - 0.09], ARM_RADIUS * 0.92, hoodie),
+      cylinder(0.05, 0.047, 0.045, cuff, [handX, HAND_Y, KEYBOARD_Z - 0.07]),
+      sphere(0.052, skin, [handX, HAND_Y - 0.008, KEYBOARD_Z - 0.02], [1, 0.8, 1.15]),
+    );
+  }
+
+  // Hood bunched behind the neck, kangaroo pocket, drawstrings.
+  const hoodRoll = torus(0.115, 0.055, materials.get(PALETTE.hoodieHood), [0, 1.055, BODY_Z - 0.055], Math.PI);
+  hoodRoll.rotation.set(Math.PI / 2, 0, 0);
+
+  character.add(
+    hoodRoll,
+    dome(0.13, materials.get(PALETTE.hoodieHood), [0, 1.03, BODY_Z - 0.1], [1, 0.85, 0.8]),
+    roundedBox([0.2, 0.11, 0.05], 0.03, materials.get(PALETTE.hoodiePocket), [0, 0.7, BODY_Z + 0.16]),
+    limb([-0.045, 1.035, BODY_Z + 0.15], [-0.05, 0.9, BODY_Z + 0.17], 0.009, materials.get(PALETTE.drawstring)),
+    limb([0.045, 1.035, BODY_Z + 0.15], [0.05, 0.89, BODY_Z + 0.17], 0.009, materials.get(PALETTE.drawstring)),
+  );
+}
+
+/** Chunky layered runner, in the spirit of a Vomero 5. */
+function addShoe(character: Group, materials: MaterialLibrary, centerX: number): void {
+  const toeZ = -0.11;
+  const heelZ = -0.3;
+  const midZ = (toeZ + heelZ) / 2;
+
+  character.add(
+    // outsole, then a thick midsole stack
+    roundedBox([0.1, 0.022, 0.2], 0.011, materials.get(PALETTE.shoeHeel), [centerX, 0.014, midZ]),
+    roundedBox([0.104, 0.042, 0.198], 0.019, materials.get(PALETTE.shoeSole), [centerX, 0.047, midZ]),
+    // upper
+    roundedBox([0.094, 0.052, 0.17], 0.024, materials.get(PALETTE.shoeUpper), [centerX, 0.09, midZ - 0.008]),
+    // toe cap and heel counter
+    sphere(0.047, materials.get(PALETTE.shoeMid), [centerX, 0.076, toeZ + 0.012], [1, 0.85, 0.9]),
+    roundedBox([0.088, 0.062, 0.05], 0.022, materials.get(PALETTE.shoeHeel), [centerX, 0.098, heelZ + 0.022]),
+    // side accent
+    box([0.098, 0.016, 0.075], materials.get(PALETTE.shoeAccent), [centerX, 0.083, midZ + 0.01]),
+  );
+}
+
+function addLegs(character: Group, materials: MaterialLibrary): void {
+  const pants = materials.get(PALETTE.pants);
+
+  for (const side of [-1, 1]) {
+    const hipX = side * 0.11;
+    const legX = side * 0.13;
+
+    character.add(
+      // thigh forward to the knee, then shin down — stopping above the ankle,
+      // which is what leaves the socks visible.
+      limb([hipX, 0.52, BODY_Z + 0.06], [legX, 0.47, -0.31], 0.077, pants),
+      limb([legX, 0.45, -0.31], [legX, PANT_CUFF_Y, -0.26], 0.064, pants),
+      cylinder(0.062, 0.058, 0.03, materials.get(PALETTE.pantsShade), [legX, PANT_CUFF_Y, -0.26]),
+      // sock, in the gap between cuff and shoe collar
+      cylinder(0.05, 0.048, 0.075, materials.get(PALETTE.sock), [legX, SOCK_TOP_Y - 0.052, -0.255]),
+    );
+
+    addShoe(character, materials, legX);
+  }
+}
+
+export function createCharacter(materials: MaterialLibrary): Group {
   const character = new Group();
 
-  const skin = materials.get(PALETTE.skin);
-  const bomber = materials.get(PALETTE.bomber);
-  const hood = materials.get(PALETTE.hood);
-  const hoodie = materials.get(PALETTE.hoodie);
-  const chair = materials.get(PALETTE.chair);
-
-  // --- chair, just enough to read as "seated" ---
+  // Hips first, so the torso capsule overlaps them rather than the reverse.
   character.add(
-    box([0.42, 0.05, 0.4], chair, [0, 0.43, BODY_Z - 0.04]),
-    outline(box([0.4, 0.46, 0.06], chair, [0, 0.78, BODY_Z - 0.24]), contour),
+    roundedBox([0.34, 0.18, 0.32], 0.07, materials.get(PALETTE.pants), [0, 0.55, BODY_Z + 0.02]),
   );
 
-  // --- body ---
-  const hips = box([0.34, 0.16, 0.30], materials.get(PALETTE.pants), [0, 0.53, BODY_Z]);
-
-  const torso = cylinder(0.225, 0.20, 0.40, bomber, [0, 0.81, BODY_Z]);
-  torso.scale.set(1, 1, 0.8);
-
-  const shoulders = cylinder(0.215, 0.215, 0.10, bomber, [0, 0.98, BODY_Z]);
-  shoulders.scale.set(1, 1, 0.8);
-
-  character.add(outline(hips, contour), outline(torso, contour), outline(shoulders, contour));
-
-  // --- hoodie and tee showing through the open jacket ---
-  character.add(
-    cylinder(0.105, 0.115, 0.08, hoodie, [0, 1.04, BODY_Z]),
-    box([0.10, 0.22, 0.04], materials.get(PALETTE.tee), [0, 0.88, BODY_Z + 0.16]),
-    box([0.035, 0.26, 0.04], hoodie, [-0.075, 0.87, BODY_Z + 0.16]),
-    box([0.035, 0.26, 0.04], hoodie, [0.075, 0.87, BODY_Z + 0.16]),
-  );
-
-  // --- the olive hood: bunched behind the neck, two drawstring-ish drapes in front ---
-  character.add(
-    box([0.26, 0.16, 0.10], hood, [0, 1.02, BODY_Z - 0.16]),
-    connect([-0.09, 1.04, BODY_Z + 0.17], [-0.10, 0.70, BODY_Z + 0.17], 0.028, hood),
-    connect([0.09, 1.04, BODY_Z + 0.17], [0.10, 0.70, BODY_Z + 0.17], 0.028, hood),
-  );
-
-  // --- head ---
-  const head = sphere(0.135, skin, [0, 1.21, BODY_Z], [1, 1.08, 0.95]);
-  character.add(
-    cylinder(0.055, 0.06, 0.1, skin, [0, 1.07, BODY_Z]),
-    outline(head, contour),
-    sphere(0.028, skin, [-0.13, 1.2, BODY_Z]),
-    sphere(0.028, skin, [0.13, 1.2, BODY_Z]),
-  );
-
-  // A face, kept to the few marks that read at this scale. The eyes are
-  // deliberately unlit — shaded eyes turn grey and look lifeless.
-  const iris = materials.unlit(PALETTE.eye);
-  const brow = materials.get(PALETTE.cap);
-  character.add(
-    box([0.028, 0.034, 0.012], iris, [-0.052, 1.205, FACE_Z]),
-    box([0.028, 0.034, 0.012], iris, [0.052, 1.205, FACE_Z]),
-    box([0.038, 0.012, 0.01], brow, [-0.052, 1.232, FACE_Z]),
-    box([0.038, 0.012, 0.01], brow, [0.052, 1.232, FACE_Z]),
-    box([0.022, 0.03, 0.026], materials.get(PALETTE.skinShadow), [0, 1.185, FACE_Z]),
-  );
-
-  // --- flat-topped cap, sitting low the way it does in the photo ---
-  const cap = materials.get(PALETTE.cap);
-  character.add(
-    outline(cylinder(0.138, 0.142, 0.115, cap, [0, 1.325, BODY_Z], 12), contour),
-    outline(cylinder(0.147, 0.147, 0.022, cap, [0, 1.272, BODY_Z], 12), contour),
-  );
-
-  // --- arms, resting on the desk: left hand at the laptop, right at the notebook ---
-  character.add(
-    connect([0.2, SHOULDER_Y, BODY_Z], [0.26, 0.8, -0.5], UPPER_ARM_RADIUS, bomber),
-    connect([0.26, 0.8, -0.5], [0.12, HAND_Y, -0.22], FOREARM_RADIUS, bomber),
-    sphere(HAND_RADIUS, skin, [0.1, HAND_Y, -0.18]),
-
-    connect([-0.2, SHOULDER_Y, BODY_Z], [-0.3, 0.8, -0.5], UPPER_ARM_RADIUS, bomber),
-    connect([-0.3, 0.8, -0.5], [-0.35, HAND_Y, -0.28], FOREARM_RADIUS, bomber),
-    sphere(HAND_RADIUS, skin, [-0.36, HAND_Y, -0.24]),
-  );
+  addHoodie(character, materials);
+  addHead(character, materials);
+  addLegs(character, materials);
 
   return character;
 }
+
+/** Consumed by the scene checks that assert the face clears the monitor. */
+export const CHARACTER_METRICS = {
+  bodyZ: BODY_Z,
+  headY: HEAD_Y,
+  headRadius: HEAD_RADIUS,
+  chinY: HEAD_Y - HEAD_RADIUS * 1.04,
+  faceZ: FACE_Z,
+  shoulderY: SHOULDER_Y,
+  handY: HAND_Y,
+  keyboardX: KEYBOARD_X,
+  keyboardZ: KEYBOARD_Z,
+  pantCuffY: PANT_CUFF_Y,
+  sockTopY: SOCK_TOP_Y,
+  shoeFloorY: SHOE_FLOOR_Y,
+} as const;

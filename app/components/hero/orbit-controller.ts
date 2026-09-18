@@ -15,13 +15,15 @@ const DRAG_RAD_PER_PX = 0.006;
 const RESUME_DELAY_MS = 2000;
 const DAMPING_RATE = 10;
 
-const POLAR_MIN_RAD = 1.02;
-const POLAR_MAX_RAD = 1.47;
-const POLAR_REST_RAD = 1.26;
+const POLAR_MIN_RAD = 0.86;
+const POLAR_MAX_RAD = 1.34;
+const POLAR_REST_RAD = 1.08;
 const POLAR_RECENTER_RATE = 1.1;
 
 /** Pointer travel before a touch gesture is classified as rotate or scroll. */
 const DIRECTION_GATE_PX = 6;
+/** Below this per-frame change the camera counts as settled and stops redrawing. */
+const SETTLED_EPSILON_RAD = 1e-5;
 
 const clamp = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max);
@@ -39,7 +41,8 @@ export interface OrbitOptions {
 }
 
 export interface OrbitController {
-  update(deltaSeconds: number, camera: PerspectiveCamera): void;
+  /** Returns whether the camera actually moved, so a settled scene can skip drawing. */
+  update(deltaSeconds: number, camera: PerspectiveCamera): boolean;
   setRadius(radius: number): void;
   dispose(): void;
 }
@@ -70,7 +73,9 @@ export function createOrbitController(
   let polarTarget = POLAR_REST_RAD;
   let autoPhase = 0;
   let autoEngaged = autoRotate;
-  let lastInteractionAt = 0;
+  // -Infinity, not 0: zero reads as "interacted at navigation start", which
+  // makes the sweep's first move depend on how fast the page loaded.
+  let lastInteractionAt = -Infinity;
 
   let activePointerId: number | null = null;
   let gesture: GestureKind = "undetermined";
@@ -78,6 +83,8 @@ export function createOrbitController(
   let gateY = 0;
   let lastX = 0;
   let lastY = 0;
+  let lastRenderedAzimuth = Number.NaN;
+  let lastRenderedPolar = Number.NaN;
 
   element.style.touchAction = "pan-y pinch-zoom";
 
@@ -186,10 +193,20 @@ export function createOrbitController(
         target.z + radius * sinPolar * Math.cos(azimuth),
       );
       camera.lookAt(target);
+
+      const moved =
+        Math.abs(azimuth - lastRenderedAzimuth) > SETTLED_EPSILON_RAD ||
+        Math.abs(polar - lastRenderedPolar) > SETTLED_EPSILON_RAD;
+      if (moved) {
+        lastRenderedAzimuth = azimuth;
+        lastRenderedPolar = polar;
+      }
+      return moved;
     },
 
     setRadius(next) {
       radius = next;
+      lastRenderedAzimuth = Number.NaN;
     },
 
     dispose() {

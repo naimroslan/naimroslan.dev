@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import {
+  Line,
   Mesh,
   PerspectiveCamera,
   Scene,
   Vector3,
   WebGLRenderer,
-  type LineBasicMaterial,
 } from "three";
 
 import type { Theme } from "~/hooks/use-theme";
@@ -15,20 +15,21 @@ import { createOrbitController } from "./orbit-controller";
 import { createCharacter } from "./scene/character";
 import { createDesk } from "./scene/desk";
 import { applyTheme, createContactShadow, createLighting, type SceneLights } from "./scene/lighting";
-import { applyOutlineTheme, createMaterialLibrary, createOutlineMaterial } from "./scene/palette";
+import { createMaterialLibrary } from "./scene/palette";
+import { createChair } from "./scene/chair";
 
 const FOV_DEG = 32;
 const NEAR_PLANE = 0.1;
 const FAR_PLANE = 20;
-const BASE_RADIUS = 3;
+const BASE_RADIUS = 3.9;
 /** Pull the camera back on portrait-ish canvases so the desk still fits. */
-const NARROW_ASPECT_BOOST = 0.75;
+const NARROW_ASPECT_BOOST = 0.45;
 const DESKTOP_MAX_DPR = 2;
 const TOUCH_MAX_DPR = 1.5;
 const MAX_FRAME_DELTA_S = 0.05;
 const MS_PER_SECOND = 1000;
 
-const TARGET = new Vector3(0, 0.72, -0.22);
+const TARGET = new Vector3(0, 0.72, -0.18);
 
 const fitRadius = (aspect: number) =>
   aspect >= 1 ? BASE_RADIUS : BASE_RADIUS * (1 + (1 - aspect) * NARROW_ASPECT_BOOST);
@@ -39,16 +40,23 @@ export interface DeskSceneProps {
 
 export default function DeskScene({ theme }: DeskSceneProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const rendererRef = useRef<WebGLRenderer | null>(null);
   const lightsRef = useRef<SceneLights | null>(null);
-  const contourRef = useRef<LineBasicMaterial | null>(null);
+  const needsRenderRef = useRef(true);
   const [unsupported, setUnsupported] = useState(false);
 
   useEffect(() => {
     const container = containerRef.current;
-    const canvas = canvasRef.current;
-    if (!container || !canvas) return;
+    if (!container) return;
+
+    // The canvas is created per effect rather than living in JSX. Teardown ends
+    // in forceContextLoss(), and a canvas that has lost its context can never
+    // obtain another one -- so reusing one element across renderer lifetimes
+    // breaks every remount after the first, which StrictMode guarantees.
+    const canvas = document.createElement("canvas");
+    canvas.className = "block h-full w-full";
+    canvas.setAttribute("aria-hidden", "true");
+    container.appendChild(canvas);
 
     let renderer: WebGLRenderer;
     try {
@@ -56,6 +64,7 @@ export default function DeskScene({ theme }: DeskSceneProps) {
     } catch {
       // No WebGL (or it is blocked): fall back to the photo rather than
       // leaving an empty hole in the hero.
+      canvas.remove();
       setUnsupported(true);
       return;
     }
@@ -73,17 +82,16 @@ export default function DeskScene({ theme }: DeskSceneProps) {
     const camera = new PerspectiveCamera(FOV_DEG, 1, NEAR_PLANE, FAR_PLANE);
 
     const materials = createMaterialLibrary();
-    const contour = createOutlineMaterial();
     const lights = createLighting();
     const shadow = createContactShadow();
     lightsRef.current = lights;
-    contourRef.current = contour;
 
     scene.add(lights.hemisphere, lights.key, lights.fill, lights.screen);
     scene.add(
       shadow.mesh,
-      createDesk(materials, contour),
-      createCharacter(materials, contour),
+      createDesk(materials),
+      createChair(materials),
+      createCharacter(materials),
     );
 
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -118,8 +126,13 @@ export default function DeskScene({ theme }: DeskSceneProps) {
           : Math.min((time - lastTime) / MS_PER_SECOND, MAX_FRAME_DELTA_S);
       lastTime = time;
 
-      controller.update(deltaSeconds, camera);
-      renderer.render(scene, camera);
+      // A static scene (reduced motion, settled camera) stops drawing entirely
+      // rather than repainting an identical frame at 60fps on someone's battery.
+      const moved = controller.update(deltaSeconds, camera);
+      if (moved || needsRenderRef.current) {
+        needsRenderRef.current = false;
+        renderer.render(scene, camera);
+      }
     };
 
     // Only animate while the hero is actually on screen and the tab is in
@@ -131,6 +144,7 @@ export default function DeskScene({ theme }: DeskSceneProps) {
       running = shouldRun;
       if (shouldRun) {
         lastTime = 0;
+        needsRenderRef.current = true;
         frameId = requestAnimationFrame(renderFrame);
       } else {
         cancelAnimationFrame(frameId);
@@ -156,29 +170,30 @@ export default function DeskScene({ theme }: DeskSceneProps) {
       document.removeEventListener("visibilitychange", syncRunning);
       controller.dispose();
 
+      // Line covers the LineSegments used for the outlines, which are not
+      // Mesh instances and would otherwise leak their EdgesGeometry.
       scene.traverse((object) => {
-        if (object instanceof Mesh) object.geometry.dispose();
+        if (object instanceof Mesh || object instanceof Line) object.geometry.dispose();
       });
       materials.dispose();
-      contour.dispose();
       shadow.dispose();
       renderer.dispose();
       renderer.forceContextLoss();
+      canvas.remove();
 
       rendererRef.current = null;
       lightsRef.current = null;
-      contourRef.current = null;
     };
   }, []);
 
   // Runs after the setup effect on mount, so this also applies the initial theme.
   useEffect(() => {
     const lights = lightsRef.current;
-    const contour = contourRef.current;
-    if (!lights || !contour) return;
+    if (!lights) return;
 
     applyTheme(lights, theme);
-    applyOutlineTheme(contour, theme);
+    // Lighting changed, so the next frame must draw even if the camera is settled.
+    needsRenderRef.current = true;
   }, [theme]);
 
   if (unsupported) {
@@ -200,7 +215,6 @@ export default function DeskScene({ theme }: DeskSceneProps) {
       role="img"
       aria-label="A low-poly 3D model of Naim Roslan at his desk, with a laptop, notebook and pens. Drag to spin it."
     >
-      <canvas ref={canvasRef} className="block h-full w-full" aria-hidden="true" />
       <p className="pointer-events-none absolute inset-x-0 bottom-0 text-center text-xs tracking-wide text-muted/70">
         drag to spin
       </p>

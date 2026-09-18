@@ -3,6 +3,7 @@ import Typed from "typed.js";
 import { SiGithub } from "react-icons/si";
 
 import type { Theme } from "~/hooks/use-theme";
+import portrait from "~/assets/naimroslan.png";
 import type { DeskSceneProps } from "./desk-scene.client";
 
 const GITHUB_URL = "https://github.com/naimroslan/";
@@ -26,6 +27,7 @@ export interface HeroProps {
 export default function Hero({ theme }: HeroProps) {
   const skillsRef = useRef<HTMLSpanElement>(null);
   const [Scene, setScene] = useState<ComponentType<DeskSceneProps> | null>(null);
+  const [chunkFailed, setChunkFailed] = useState(false);
 
   // three.js is pulled in only after hydration, which keeps it out of both the
   // Workers bundle and the entry chunk. The placeholder below reserves the
@@ -37,8 +39,11 @@ export default function Hero({ theme }: HeroProps) {
       .then((module) => {
         if (!cancelled) setScene(() => module.default);
       })
-      .catch(() => {
-        // Chunk failed to load; the hero stays type-only.
+      .catch((error: unknown) => {
+        // A stale deploy or an offline visitor would otherwise be left staring
+        // at the placeholder forever, so fall back to the photo.
+        console.error("Hero scene failed to load", error);
+        if (!cancelled) setChunkFailed(true);
       });
 
     return () => {
@@ -86,9 +91,13 @@ export default function Hero({ theme }: HeroProps) {
         </div>
 
         <div className="relative h-[42vh] min-h-[260px] lg:h-[70vh]">
-          {Scene ? (
-            <Scene theme={theme} />
-          ) : (
+          {Scene && <Scene theme={theme} />}
+          {!Scene && chunkFailed && (
+            <div className="flex h-full w-full items-end justify-center">
+              <img src={portrait} alt="Naim Roslan" className="max-h-full w-auto object-contain" />
+            </div>
+          )}
+          {!Scene && !chunkFailed && (
             <div className="flex h-full w-full items-center justify-center">
               <div className="h-24 w-24 rounded-full bg-fg/5 motion-safe:animate-pulse" />
             </div>

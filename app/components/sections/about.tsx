@@ -7,10 +7,14 @@ import {
   SiNodedotjs,
   SiPostgresql,
   SiPython,
+  SiReact,
   SiReactrouter,
+  SiShadcnui,
   SiTailwindcss,
   SiTypescript,
 } from "react-icons/si";
+
+import TanstackIcon from "~/components/icons/tanstack";
 
 import { about } from "~/data/content";
 
@@ -21,9 +25,12 @@ const STACK = [
   { Icon: SiTypescript, label: "TypeScript" },
   { Icon: SiJavascript, label: "JavaScript" },
   { Icon: SiPython, label: "Python" },
+  { Icon: SiReact, label: "React" },
   { Icon: SiReactrouter, label: "React Router" },
+  { Icon: TanstackIcon, label: "TanStack Start" },
   { Icon: SiNodedotjs, label: "Node.js" },
   { Icon: SiTailwindcss, label: "Tailwind CSS" },
+  { Icon: SiShadcnui, label: "shadcn/ui" },
   { Icon: SiPostgresql, label: "Postgres" },
   { Icon: SiMailtrap, label: "Mailtrap" },
   { Icon: SiDocker, label: "Docker" },

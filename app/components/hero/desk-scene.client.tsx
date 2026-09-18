@@ -12,24 +12,24 @@ import type { Theme } from "~/hooks/use-theme";
 import portrait from "~/assets/naimroslan.png";
 
 import { createOrbitController } from "./orbit-controller";
-import { createCharacter } from "./scene/character";
-import { createDesk } from "./scene/desk";
+import { createDiorama } from "./scene/diorama";
 import { applyTheme, createContactShadow, createLighting, type SceneLights } from "./scene/lighting";
 import { createMaterialLibrary } from "./scene/palette";
-import { createChair } from "./scene/chair";
 
 const FOV_DEG = 32;
 const NEAR_PLANE = 0.1;
 const FAR_PLANE = 20;
-const BASE_RADIUS = 3.9;
+const BASE_RADIUS = 8;
 /** Pull the camera back on portrait-ish canvases so the desk still fits. */
 const NARROW_ASPECT_BOOST = 0.45;
 const DESKTOP_MAX_DPR = 2;
 const TOUCH_MAX_DPR = 1.5;
 const MAX_FRAME_DELTA_S = 0.05;
 const MS_PER_SECOND = 1000;
+/** Opens on the desk nook, looking in through the cutaway corner. */
+const START_AZIMUTH_RAD = 0.58;
 
-const TARGET = new Vector3(0, 0.72, -0.18);
+const TARGET = new Vector3(0, 1.15, 0);
 
 const fitRadius = (aspect: number) =>
   aspect >= 1 ? BASE_RADIUS : BASE_RADIUS * (1 + (1 - aspect) * NARROW_ASPECT_BOOST);
@@ -87,17 +87,13 @@ export default function DeskScene({ theme }: DeskSceneProps) {
     lightsRef.current = lights;
 
     scene.add(lights.hemisphere, lights.key, lights.fill, lights.screen);
-    scene.add(
-      shadow.mesh,
-      createDesk(materials),
-      createChair(materials),
-      createCharacter(materials),
-    );
+    scene.add(shadow.mesh, createDiorama(materials));
 
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const controller = createOrbitController(canvas, {
       radius: BASE_RADIUS,
       target: TARGET,
+      startAzimuth: START_AZIMUTH_RAD,
       autoRotate: !prefersReducedMotion,
     });
 

@@ -48,9 +48,15 @@ export const roundedBox = (
   // the profile and the bevel would then overshoot the requested bounds.
   const smallestHalf = Math.min(width, height, depth) / 2;
   const bevel = Math.min(radius, smallestHalf * 0.9);
-  const cornerRadius = Math.max(radius - bevel, 0.001);
   const halfWidth = width / 2 - bevel;
   const halfHeight = height / 2 - bevel;
+  // The corner arcs must also fit inside the inset profile. Without this a
+  // very flat box -- a rug, a trackpad -- gets arcs larger than its own
+  // half-height, and the shape self-intersects into garbage geometry.
+  const cornerRadius = Math.max(
+    Math.min(radius - bevel, halfWidth * 0.95, halfHeight * 0.95),
+    0.0005,
+  );
 
   const shape = new Shape();
   shape.moveTo(-halfWidth + cornerRadius, -halfHeight);
@@ -73,6 +79,30 @@ export const roundedBox = (
   });
   // Extrusion grows along +z from the profile plane; recentre it on the origin.
   geometry.translate(0, 0, -(depth - bevel * 2) / 2);
+  geometry.computeVertexNormals();
+
+  const mesh = new Mesh(geometry, material);
+  mesh.position.set(...at);
+  return mesh;
+};
+
+/**
+ * Extrudes an arbitrary flat polygon along z. Needed for the gable triangles,
+ * which no primitive covers; also handy for any wedge-shaped panel.
+ */
+export const prism = (
+  outline: readonly (readonly [number, number])[],
+  depth: number,
+  material: Material,
+  at: Point,
+): Mesh => {
+  const shape = new Shape();
+  shape.moveTo(outline[0][0], outline[0][1]);
+  for (const [x, y] of outline.slice(1)) shape.lineTo(x, y);
+  shape.closePath();
+
+  const geometry = new ExtrudeGeometry(shape, { depth, bevelEnabled: false });
+  geometry.translate(0, 0, -depth / 2);
   geometry.computeVertexNormals();
 
   const mesh = new Mesh(geometry, material);
@@ -158,6 +188,66 @@ export const torus = (
   const mesh = new Mesh(new TorusGeometry(radius, tube, 10, 20, arc), material);
   mesh.position.set(...at);
   return mesh;
+};
+
+/**
+ * A tapered limb spanning two points, with a sphere at each end.
+ *
+ * The end spheres are the point: butting untapered capsules together leaves a
+ * visible discontinuity at every joint, which is what made the arms read as
+ * disconnected tubes rather than limbs.
+ */
+export const taperedLimb = (
+  from: Point,
+  to: Point,
+  radiusFrom: number,
+  radiusTo: number,
+  material: Material,
+): Mesh[] => {
+  const start = new Vector3(...from);
+  const direction = new Vector3(...to).sub(start);
+  const span = direction.length();
+
+  const shaft = new Mesh(
+    new CylinderGeometry(radiusTo, radiusFrom, span, ROUND_SEGMENTS),
+    material,
+  );
+  shaft.position.copy(start).addScaledVector(direction, 0.5);
+  shaft.quaternion.setFromUnitVectors(UP, direction.clone().normalize());
+
+  return [shaft, sphere(radiusFrom, material, from), sphere(radiusTo, material, to)];
+};
+
+/**
+ * A mitten hand: a flattened rounded palm with a thumb nub, pointing along +z
+ * before `yaw` is applied. Finger detail is deliberately abandoned — a mitten
+ * reads as a stylistic choice, whereas a failed hand just reads as broken.
+ */
+export const mitten = (
+  material: Material,
+  at: Point,
+  yaw = 0,
+  radius = 0.052,
+): Mesh => {
+  const hand = new Mesh(
+    new SphereGeometry(radius, SPHERE_WIDTH_SEGMENTS, SPHERE_HEIGHT_SEGMENTS),
+    material,
+  );
+  hand.position.set(...at);
+  hand.scale.set(1, 0.66, 1.34);
+  hand.rotation.y = yaw;
+
+  const thumb = new Mesh(
+    new CapsuleGeometry(radius * 0.42, radius * 0.5, CAPSULE_CAP_SEGMENTS, ROUND_SEGMENTS),
+    material,
+  );
+  // Sits on the palm's inner edge, angled forward and slightly up.
+  thumb.position.set(-radius * 0.72, radius * 0.1, radius * 0.5);
+  thumb.rotation.set(Math.PI / 2.6, 0, -Math.PI / 5);
+  thumb.scale.set(1, 1, 1 / 1.34);
+  hand.add(thumb);
+
+  return hand;
 };
 
 /**

@@ -26,22 +26,22 @@ const THEME_LIGHTING = {
   light: {
     sky: 0xffffff,
     ground: 0xd8d4cd,
-    hemisphere: 1.7,
-    key: 2.1,
-    fill: 0.5,
-    screen: 0.12,
+    hemisphere: 1.55,
+    key: 1.85,
+    fill: 0.55,
+    screen: 1.1,
   },
   dark: {
     sky: 0x3a4252,
     ground: 0x0d0f14,
-    hemisphere: 1,
-    key: 1.25,
+    hemisphere: 0.8,
+    key: 1.0,
     fill: 0.3,
-    screen: 0.6,
+    screen: 2.6,
   },
 } as const;
 
-const SCREEN_LIGHT_DISTANCE = 1.1;
+const SCREEN_LIGHT_DISTANCE = 3.2;
 
 export function createLighting(): SceneLights {
   const hemisphere = new HemisphereLight();
@@ -52,10 +52,11 @@ export function createLighting(): SceneLights {
   const fill = new DirectionalLight();
   fill.position.set(-3.6, 1.8, -2.8);
 
-  // Sits just in front of the laptop screen so its glow spills onto the face
-  // and hands, which is what sells the scene in dark mode.
-  const screen = new PointLight(0x8fb7ff, 0, SCREEN_LIGHT_DISTANCE);
-  screen.position.set(0.02, 0.88, -0.24);
+  // Warm spill from the window and screens on the cottage's left wall. Its
+  // position follows the desk nook, which now sits against that wall rather
+  // than free-standing in the middle of the scene.
+  const screen = new PointLight(0xffd9a0, 0, SCREEN_LIGHT_DISTANCE);
+  screen.position.set(-1.0, 1.2, -0.05);
 
   return { hemisphere, key, fill, screen };
 }

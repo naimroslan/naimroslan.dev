@@ -1,23 +1,26 @@
 import type { PerspectiveCamera, Vector3 } from "three";
 
 /**
- * The automatic motion is a bounded sweep rather than a full turntable: the
- * diorama is built to be seen from the front, and a 360° orbit would spend a
- * third of its cycle behind the laptop lid and the back of the character's
- * head, where none of the props are visible.
+ * Drag is unbounded — the room spins a full 360° and beyond. The *automatic*
+ * motion, though, is a gentle oscillation around the opening view, and after a
+ * drag the camera eases back to it by the shortest way round.
+ *
+ * The reason is what the back of a cutaway looks like: a featureless shell.
+ * Continuous rotation would park there half the time, so the room presents its
+ * open side at rest and the spin stays available on demand.
  */
-const AUTO_SWEEP_AMPLITUDE_RAD = 0.42;
-const AUTO_PHASE_SPEED_RAD_S = 0.22;
-const AUTO_REJOIN_RATE = 1.6;
+const AUTO_SWEEP_AMPLITUDE_RAD = 0.34;
+const AUTO_PHASE_SPEED_RAD_S = 0.2;
+const AUTO_RETURN_RATE = 1.1;
+const TWO_PI = Math.PI * 2;
 
-const DRAG_AZIMUTH_LIMIT_RAD = 1.15;
 const DRAG_RAD_PER_PX = 0.006;
 const RESUME_DELAY_MS = 2000;
 const DAMPING_RATE = 10;
 
-const POLAR_MIN_RAD = 0.86;
-const POLAR_MAX_RAD = 1.34;
-const POLAR_REST_RAD = 1.08;
+const POLAR_MIN_RAD = 0.72;
+const POLAR_MAX_RAD = 1.28;
+const POLAR_REST_RAD = 1.02;
 const POLAR_RECENTER_RATE = 1.1;
 
 /** Pointer travel before a touch gesture is classified as rotate or scroll. */
@@ -28,6 +31,12 @@ const SETTLED_EPSILON_RAD = 1e-5;
 const clamp = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max);
 
+/** Wraps an angular difference into (-PI, PI], so the return takes the short way. */
+const shortestTurn = (delta: number) => {
+  const wrapped = ((delta % TWO_PI) + TWO_PI) % TWO_PI;
+  return wrapped > Math.PI ? wrapped - TWO_PI : wrapped;
+};
+
 /** Frame-rate independent exponential approach. */
 const damp = (current: number, target: number, rate: number, deltaSeconds: number) =>
   current + (target - current) * (1 - Math.exp(-rate * deltaSeconds));
@@ -37,6 +46,8 @@ type GestureKind = "undetermined" | "rotate" | "scroll";
 export interface OrbitOptions {
   radius: number;
   target: Vector3;
+  /** Opening angle, so the scene starts on its best view rather than on an axis. */
+  startAzimuth?: number;
   autoRotate?: boolean;
 }
 
@@ -64,18 +75,17 @@ export function createOrbitController(
   element: HTMLElement,
   options: OrbitOptions,
 ): OrbitController {
-  const { target, autoRotate = true } = options;
+  const { target, startAzimuth = 0, autoRotate = true } = options;
 
   let radius = options.radius;
-  let azimuth = 0;
-  let azimuthTarget = 0;
+  let azimuth = startAzimuth;
+  let azimuthTarget = startAzimuth;
   let polar = POLAR_REST_RAD;
   let polarTarget = POLAR_REST_RAD;
-  let autoPhase = 0;
-  let autoEngaged = autoRotate;
   // -Infinity, not 0: zero reads as "interacted at navigation start", which
-  // makes the sweep's first move depend on how fast the page loaded.
+  // makes the first move depend on how fast the page loaded.
   let lastInteractionAt = -Infinity;
+  let autoPhase = 0;
 
   let activePointerId: number | null = null;
   let gesture: GestureKind = "undetermined";
@@ -90,6 +100,9 @@ export function createOrbitController(
 
   const onPointerDown = (event: PointerEvent) => {
     if (!event.isPrimary || activePointerId !== null) return;
+    // Hand the drag the camera's settled angle, so grabbing mid-rotation does
+    // not jump.
+    azimuthTarget = azimuth;
 
     activePointerId = event.pointerId;
     // A mouse has no competing scroll gesture, so it rotates immediately.
@@ -99,7 +112,6 @@ export function createOrbitController(
     lastX = event.clientX;
     lastY = event.clientY;
     lastInteractionAt = performance.now();
-    autoEngaged = false;
     element.setPointerCapture(event.pointerId);
   };
 
@@ -123,11 +135,8 @@ export function createOrbitController(
       if (gesture === "scroll") return;
     }
 
-    azimuthTarget = clamp(
-      azimuthTarget - deltaX * DRAG_RAD_PER_PX,
-      -DRAG_AZIMUTH_LIMIT_RAD,
-      DRAG_AZIMUTH_LIMIT_RAD,
-    );
+    // Unbounded: drag spins the room freely through a full turn and beyond.
+    azimuthTarget -= deltaX * DRAG_RAD_PER_PX;
     // Vertical belongs to the page scroller on touch, so only a mouse tilts.
     if (event.pointerType === "mouse") {
       polarTarget = clamp(
@@ -164,19 +173,9 @@ export function createOrbitController(
       const idle = performance.now() - lastInteractionAt > RESUME_DELAY_MS;
 
       if (autoRotate && !dragging && idle) {
-        // Seed the oscillator at the phase matching where the drag ended, so
-        // handing back to the sweep has no discontinuity to smooth over.
-        if (!autoEngaged) {
-          autoEngaged = true;
-          autoPhase = Math.asin(clamp(azimuthTarget / AUTO_SWEEP_AMPLITUDE_RAD, -1, 1));
-        }
         autoPhase += AUTO_PHASE_SPEED_RAD_S * deltaSeconds;
-        azimuthTarget = damp(
-          azimuthTarget,
-          Math.sin(autoPhase) * AUTO_SWEEP_AMPLITUDE_RAD,
-          AUTO_REJOIN_RATE,
-          deltaSeconds,
-        );
+        const home = startAzimuth + Math.sin(autoPhase) * AUTO_SWEEP_AMPLITUDE_RAD;
+        azimuthTarget += shortestTurn(home - azimuthTarget) * (1 - Math.exp(-AUTO_RETURN_RATE * deltaSeconds));
       }
 
       if (!dragging) {

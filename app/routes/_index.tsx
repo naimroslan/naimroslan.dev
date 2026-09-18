@@ -25,7 +25,7 @@ export default function Index() {
     <>
       <Navbar onToggleTheme={toggle} />
 
-      <main id="top">
+      <main>
         <Hero theme={theme} />
         <About />
         <Projects />

@@ -64,7 +64,7 @@ export default function Hero({ theme }: HeroProps) {
   }, []);
 
   return (
-    <section className="mx-auto w-full max-w-6xl px-6 lg:px-10">
+    <section id="home" className="mx-auto w-full max-w-6xl px-6 lg:px-10">
       <div className="grid items-center gap-6 pt-10 pb-6 lg:min-h-[calc(100vh-4rem)] lg:grid-cols-2 lg:gap-12 lg:py-0">
         <div className="flex flex-col">
           <p className="animate-slidein [--slidein-delay:200ms] text-sm font-medium tracking-wide text-muted">

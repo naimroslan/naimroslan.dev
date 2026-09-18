@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { HiOutlineMoon, HiOutlineSun } from "react-icons/hi2";
 
 const NAV_ITEMS = [
+  { id: "home", label: "Home" },
   { id: "about", label: "About" },
   { id: "projects", label: "Projects" },
   { id: "contact", label: "Contact" },

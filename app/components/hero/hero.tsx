@@ -87,12 +87,12 @@ export default function Hero({ theme }: HeroProps) {
             href={GITHUB_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="animate-slidein [--slidein-delay:700ms] group mt-10 inline-flex w-fit items-center gap-4 text-sm font-medium transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+            className="animate-slidein [--slidein-delay:700ms] group mt-10 flex w-full items-center gap-4 text-sm font-medium sm:inline-flex sm:w-fit transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
           >
             {/* Decorative rule, so it is not announced as content inside the link. */}
             <span
               aria-hidden="true"
-              className="h-px w-24 bg-line transition-colors group-hover:bg-accent sm:w-32"
+              className="h-px flex-1 bg-line transition-colors group-hover:bg-accent sm:w-32 sm:flex-none"
             />
             <SiGithub aria-hidden="true" />
             Github

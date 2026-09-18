@@ -11,6 +11,9 @@ import type { Route } from "./+types/root";
 import "./app.css";
 
 export const links: Route.LinksFunction = () => [
+  // SVG first; favicon.ico stays declared for browsers that cannot use it.
+  { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+  { rel: "alternate icon", href: "/favicon.ico", sizes: "any" },
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
     rel: "preconnect",
@@ -19,7 +22,7 @@ export const links: Route.LinksFunction = () => [
   },
   {
     rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@300..700&display=swap",
+    href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap",
   },
 ];
 

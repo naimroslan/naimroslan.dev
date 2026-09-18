@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { HiOutlineMoon, HiOutlineSun } from "react-icons/hi2";
 
 const NAV_ITEMS = [
-  { id: "about", label: "ABOUT" },
-  { id: "projects", label: "PROJECTS" },
-  { id: "contact", label: "CONTACT" },
+  { id: "about", label: "About" },
+  { id: "projects", label: "Projects" },
+  { id: "contact", label: "Contact" },
 ] as const;
 
 /**
@@ -71,41 +71,49 @@ export default function Navbar({ onToggleTheme }: NavbarProps) {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-line bg-page/80 backdrop-blur-md">
+    /**
+     * No border and no backdrop blur: the bar fades from the page colour at its
+     * top to transparent at its bottom. A blur would have to go regardless of
+     * the border, since backdrop-filter applies across the whole element box
+     * and would leave a hard cut-off exactly where the fade should vanish.
+     *
+     * The transparent lower half overlays scrolling content, so the header
+     * itself takes no pointer events and the controls opt back in.
+     */
+    <header className="pointer-events-none sticky top-0 z-50 bg-linear-to-b from-page from-30% via-page/80 to-transparent">
       <nav
         aria-label="Main"
-        className="mx-auto flex h-16 max-w-6xl items-center gap-0.5 px-6 lg:gap-1 lg:px-10"
+        className="mx-auto flex h-16 max-w-6xl items-center px-6 lg:px-10"
       >
-        <a
-          href="#top"
-          // Press Start 2P has a single weight, so font-semibold would trigger
-          // faux bold and smear the pixel grid; negative tracking collides a
-          // monospace pixel face's glyph cells. Sized down because its ~1em
-          // advance reads roughly twice as wide as Space Grotesk's.
-          className="mr-auto font-pixel text-xs lg:text-sm"
-        >
-          <span className="lg:hidden">n.</span>
-          <span className="hidden lg:inline">naimroslan.</span>
-        </a>
-
-        {NAV_ITEMS.map(({ id, label }) => (
-          <a
-            key={id}
-            href={`#${id}`}
-            aria-current={activeSection === id ? "true" : undefined}
-            className={`rounded-xs px-2.5 py-2 text-xs font-medium tracking-[0.12em] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent lg:px-3 lg:text-sm ${
-              activeSection === id ? "text-accent" : "text-muted hover:text-fg"
-            }`}
-          >
-            {label}
-          </a>
-        ))}
+        <ul className="pointer-events-auto flex items-center">
+          {NAV_ITEMS.map(({ id, label }) => {
+            const isActive = activeSection === id;
+            return (
+              <li key={id}>
+                <a
+                  href={`#${id}`}
+                  /* The dot carries no text, so the accessible name has to come
+                     from here or the link announces as nothing at all. */
+                  aria-label={label}
+                  aria-current={isActive ? "true" : undefined}
+                  className="group flex h-10 items-center px-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                >
+                  <span
+                    className={`h-1.5 rounded-full transition-all duration-300 motion-reduce:transition-none ${
+                      isActive ? "w-6 bg-accent" : "w-1.5 bg-muted/45 group-hover:bg-muted"
+                    }`}
+                  />
+                </a>
+              </li>
+            );
+          })}
+        </ul>
 
         <button
           type="button"
           onClick={onToggleTheme}
           aria-label="Toggle theme"
-          className="ml-1 flex size-9 cursor-pointer items-center justify-center rounded-xs text-muted transition-colors hover:bg-fg/5 hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="pointer-events-auto ml-auto flex size-9 cursor-pointer items-center justify-center rounded-xs text-muted transition-colors hover:bg-fg/5 hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
           <HiOutlineSun className="hidden dark:block" aria-hidden="true" />
           <HiOutlineMoon className="block dark:hidden" aria-hidden="true" />

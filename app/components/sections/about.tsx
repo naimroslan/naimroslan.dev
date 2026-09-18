@@ -48,7 +48,7 @@ export default function About() {
               {STACK.map(({ Icon, label }) => (
                 <li
                   key={label}
-                  className="flex items-center gap-2 rounded-full border border-line bg-surface px-3.5 py-1.5 text-sm"
+                  className="flex items-center gap-2 rounded-xs border border-line bg-surface px-3.5 py-1.5 text-sm"
                 >
                   <Icon size={ICON_SIZE} aria-hidden="true" />
                   {label}

@@ -83,7 +83,7 @@ export default function Hero({ theme }: HeroProps) {
             href={GITHUB_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="animate-slidein [--slidein-delay:700ms] mt-8 inline-flex w-fit items-center gap-2 rounded-full border border-line bg-surface px-5 py-2.5 text-sm font-medium transition-colors hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="animate-slidein [--slidein-delay:700ms] mt-8 inline-flex w-fit items-center gap-2 rounded-xs border border-line bg-surface px-5 py-2.5 text-sm font-medium transition-colors hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
             <SiGithub aria-hidden="true" />
             Github

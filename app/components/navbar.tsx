@@ -89,7 +89,7 @@ export default function Navbar({ onToggleTheme }: NavbarProps) {
             key={id}
             href={`#${id}`}
             aria-current={activeSection === id ? "true" : undefined}
-            className={`rounded-full px-2.5 py-2 text-xs font-medium tracking-[0.12em] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent lg:px-3 lg:text-sm ${
+            className={`rounded-xs px-2.5 py-2 text-xs font-medium tracking-[0.12em] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent lg:px-3 lg:text-sm ${
               activeSection === id ? "text-accent" : "text-muted hover:text-fg"
             }`}
           >
@@ -101,7 +101,7 @@ export default function Navbar({ onToggleTheme }: NavbarProps) {
           type="button"
           onClick={onToggleTheme}
           aria-label="Toggle theme"
-          className="ml-1 flex size-9 cursor-pointer items-center justify-center rounded-full text-muted transition-colors hover:bg-fg/5 hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="ml-1 flex size-9 cursor-pointer items-center justify-center rounded-xs text-muted transition-colors hover:bg-fg/5 hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
           <HiOutlineSun className="hidden dark:block" aria-hidden="true" />
           <HiOutlineMoon className="block dark:hidden" aria-hidden="true" />

@@ -220,11 +220,8 @@ export default function DeskScene({ theme }: DeskSceneProps) {
       ref={containerRef}
       className="relative h-full w-full cursor-grab overscroll-x-contain active:cursor-grabbing"
       role="img"
-      aria-label="A low-poly 3D model of Naim Roslan at his desk, with a laptop, notebook and pens. Drag to spin it."
+      aria-label="A low-poly 3D model of Naim Roslan at his desk, with a monitor, laptop, split keyboard and a plant. Drag to spin it."
     >
-      <p className="pointer-events-none absolute inset-x-0 bottom-0 text-center text-xs tracking-wide text-muted/70">
-        drag to spin
-      </p>
     </div>
   );
 }

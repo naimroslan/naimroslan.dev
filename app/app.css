@@ -79,7 +79,8 @@ body {
     .card {
         background-color: var(--surface);
         border: 1px solid var(--line);
-        border-radius: 1rem;
+        /* Backs both the project cards and the contact link rows. */
+        border-radius: 0.25rem;
         box-shadow: var(--card-shadow);
         transition:
             box-shadow 0.25s ease,

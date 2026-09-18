@@ -19,7 +19,7 @@ import { createMaterialLibrary } from "./scene/palette";
 const FOV_DEG = 32;
 const NEAR_PLANE = 0.1;
 const FAR_PLANE = 20;
-const BASE_RADIUS = 4.7;
+const BASE_RADIUS = 5.4;
 /** Pull the camera back on portrait-ish canvases so the desk still fits. */
 const NARROW_ASPECT_BOOST = 0.45;
 const DESKTOP_MAX_DPR = 2;
@@ -32,7 +32,9 @@ const MS_PER_SECOND = 1000;
  */
 const START_AZIMUTH_RAD = 2.55;
 
-const TARGET = new Vector3(0, 0.76, -0.05);
+// Shifted off centre in x: the floor plant sits to the desk's right, so the
+// scene's own centre is not the desk's.
+const TARGET = new Vector3(-0.22, 0.74, -0.05);
 
 const fitRadius = (aspect: number) =>
   aspect >= 1 ? BASE_RADIUS : BASE_RADIUS * (1 + (1 - aspect) * NARROW_ASPECT_BOOST);

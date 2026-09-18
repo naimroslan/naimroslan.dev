@@ -3,6 +3,7 @@ import { Group } from "three";
 import { createCharacter } from "./character";
 import { createChair } from "./chair";
 import { createDesk } from "./desk";
+import { createFloorPlant } from "./plant";
 import type { MaterialLibrary } from "./palette";
 
 /**
@@ -11,6 +12,13 @@ import type { MaterialLibrary } from "./palette";
  */
 export function createDiorama(materials: MaterialLibrary): Group {
   const diorama = new Group();
-  diorama.add(createDesk(materials), createChair(materials), createCharacter(materials));
+  diorama.add(
+    createDesk(materials),
+    createChair(materials),
+    createCharacter(materials),
+    // Floor-standing beside the desk. Viewed from behind the figure, world -x
+    // reads as frame-right, which is the side the reference puts it on.
+    createFloorPlant(materials, [-1.22, 0, 0.1]),
+  );
   return diorama;
 }

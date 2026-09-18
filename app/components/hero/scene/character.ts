@@ -11,8 +11,13 @@ import { box, cylinder, dome, limb, mitten, roundedBox, sphere, taperedLimb, tor
 const BODY_Z = -0.62;
 const HEAD_Y = 1.28;
 const HEAD_RADIUS = 0.16;
-/** Just proud of the head's front surface, so face details sit on it. */
-const FACE_Z = BODY_Z + HEAD_RADIUS * 0.9;
+/** Head-local: just proud of the skull's front surface, so face details sit on it. */
+const FACE_Z = HEAD_RADIUS * 0.9;
+const EYE_Y = -0.01;
+const BROW_Y = 0.03;
+const BEANIE_CUFF_HEIGHT = 0.058;
+/** Places the cuff's underside at 0.052, clear of the brow top at ~0.0355. */
+const BEANIE_CUFF_Y = 0.081;
 /** Turns the head toward the room, away from the desk it faces. */
 const HEAD_TURN_RAD = 0.62;
 
@@ -29,45 +34,60 @@ const SHOE_FLOOR_Y = 0.003;
 
 function addHead(character: Group, materials: MaterialLibrary): void {
   const skin = materials.get(PALETTE.skin);
-  // The figure faces its desk, so without this the camera only ever sees the
-  // back of the head. A modest turn opens the face to a three-quarter profile.
+
+  // Everything that belongs to the head lives in this group, in head-local
+  // coordinates. Previously the skull and beanie were parented here while the
+  // eyes, brows and nose were added to `character` in world coordinates, so the
+  // face never turned with the head -- it sat on the side of a rotated skull.
   const head = new Group();
   head.position.set(0, HEAD_Y, BODY_Z);
   head.rotation.y = HEAD_TURN_RAD;
   character.add(head);
 
-  head.add(
-    sphere(HEAD_RADIUS, skin, [0, 0, 0], [1, 1.04, 0.94]),
-    sphere(0.03, skin, [-0.152, -0.01, 0]),
-    sphere(0.03, skin, [0.152, -0.01, 0]),
-  );
+  // The neck stays on the body: it should not swivel with the head.
   character.add(cylinder(0.058, 0.066, 0.1, materials.get(PALETTE.skinShade), [0, 1.12, BODY_Z]));
 
-  // Minimal features, per the reference: eyes carry it, everything else is a hint.
+  head.add(
+    sphere(HEAD_RADIUS, skin, [0, 0, 0], [1, 1.04, 0.94]),
+    sphere(0.03, skin, [-0.152, -0.012, 0]),
+    sphere(0.03, skin, [0.152, -0.012, 0]),
+  );
+
+  // Hair, at the back and sides only. A dome centred low enough to show below
+  // the beanie also reaches forward across the face, and being wider than the
+  // skull it bulged out over the eyes -- which is what actually hid them. So
+  // the shell is pushed back until its front edge sits behind the face plane.
+  head.add(
+    sphere(0.156, materials.get(PALETTE.hair), [0, -0.022, -0.05], [1.04, 0.92, 0.95]),
+    sphere(0.055, materials.get(PALETTE.hair), [0, -0.012, -HEAD_RADIUS * 0.84], [1.5, 0.9, 0.7]),
+  );
+
+  // Minimal features, per the reference: eyes carry it, everything else a hint.
   const iris = materials.unlit(PALETTE.eye);
   const brow = materials.get(PALETTE.brow);
-  character.add(
-    sphere(0.019, iris, [-0.058, HEAD_Y - 0.005, FACE_Z], [1, 1.15, 0.6]),
-    sphere(0.019, iris, [0.058, HEAD_Y - 0.005, FACE_Z], [1, 1.15, 0.6]),
-    roundedBox([0.042, 0.011, 0.012], 0.005, brow, [-0.058, HEAD_Y + 0.036, FACE_Z]),
-    roundedBox([0.042, 0.011, 0.012], 0.005, brow, [0.058, HEAD_Y + 0.036, FACE_Z]),
-    sphere(0.018, materials.get(PALETTE.skinShade), [0, HEAD_Y - 0.042, FACE_Z], [0.8, 1, 0.8]),
+  head.add(
+    sphere(0.019, iris, [-0.055, EYE_Y, FACE_Z], [1, 1.15, 0.6]),
+    sphere(0.019, iris, [0.055, EYE_Y, FACE_Z], [1, 1.15, 0.6]),
+    roundedBox([0.042, 0.011, 0.012], 0.005, brow, [-0.055, BROW_Y, FACE_Z]),
+    roundedBox([0.042, 0.011, 0.012], 0.005, brow, [0.055, BROW_Y, FACE_Z]),
+    sphere(0.018, materials.get(PALETTE.skinShade), [0, EYE_Y - 0.036, FACE_Z], [0.8, 1, 0.8]),
   );
 
-  // Hair under the beanie: a slightly larger dome at the back and sides, which
-  // the cap then covers from the crown down to the brow.
+  // Beanie. The cuff's underside must clear the top of the brow -- at its old
+  // height the brim's bottom edge landed exactly on the top of the eye.
+  // The dome is y-squashed on purpose: an unscaled hemisphere raised far enough
+  // to clear the brow balloons well above the skull and reads as a chef's hat.
   head.add(
-    dome(HEAD_RADIUS + 0.014, materials.get(PALETTE.hair), [0, -0.05, -0.012], [1.02, 0.85, 1.04]),
-    sphere(0.055, materials.get(PALETTE.hair), [0, 0.0, -HEAD_RADIUS * 0.82], [1.5, 0.9, 0.7]),
-  );
-
-  // Beanie: dome plus a thick folded cuff sitting at the brow line.
-  head.add(
-    dome(HEAD_RADIUS + 0.012, materials.get(PALETTE.beanie), [0, 0.028, 0], [1, 1, 0.96]),
-    cylinder(HEAD_RADIUS + 0.02, HEAD_RADIUS + 0.022, 0.062, materials.get(PALETTE.beanieCuff), [0, 0.048, 0]),
+    dome(HEAD_RADIUS + 0.008, materials.get(PALETTE.beanie), [0, 0.05, 0], [1.03, 0.72, 1]),
+    cylinder(
+      HEAD_RADIUS + 0.018,
+      HEAD_RADIUS + 0.021,
+      BEANIE_CUFF_HEIGHT,
+      materials.get(PALETTE.beanieCuff),
+      [0, BEANIE_CUFF_Y, 0],
+    ),
   );
 }
-
 function addHoodie(character: Group, materials: MaterialLibrary): void {
   const hoodie = materials.get(PALETTE.hoodie);
 
@@ -129,9 +149,11 @@ function addShoe(character: Group, materials: MaterialLibrary, centerX: number):
     limb([centerX, 0.078, heelZ + 0.055], [centerX, 0.07, toeZ - 0.035], 0.042, materials.get(PALETTE.sock)),
   );
 
-  // Two straps, angled the way a slide's are.
-  for (const [offset, tilt] of [[0.045, 0.24], [-0.028, -0.16]] as const) {
-    const band = roundedBox([0.114, 0.03, 0.042], 0.013, strap, [centerX, 0.088, midZ + offset]);
+  // Two wide straps arching over the instep. They were previously both too
+  // narrow and too low: at y 0.088 they cut through the sock, whose top is at
+  // ~0.12, so the sock showed where the strap should have been.
+  for (const [offset, tilt] of [[0.056, 0.2], [-0.026, -0.13]] as const) {
+    const band = roundedBox([0.118, 0.052, 0.078], 0.018, strap, [centerX, 0.101, midZ + offset]);
     band.rotation.x = tilt;
     character.add(band);
   }

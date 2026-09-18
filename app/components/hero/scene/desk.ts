@@ -16,16 +16,16 @@ export const KEYBOARD_X = 0.14;
 export const KEYBOARD_Z = -0.12;
 
 const MONITOR_BOTTOM_Y = 0.87;
-const MONITOR_TOP_Y = 1.19;
+const MONITOR_TOP_Y = 1.206;
 const MONITOR_Z = 0.24;
 const MONITOR_X = -0.04;
-const MONITOR_WIDTH = 1.04;
+// A 27" 16:9 panel is 0.686 m diagonal, so 0.598 x 0.336.
+const MONITOR_WIDTH = 0.6;
 
 const KEY_ROWS = 3;
 const KEY_COLUMNS = 5;
 const KEY_PITCH = 0.031;
 const NOTE_LINES = 4;
-const SNAKE_LEAVES = 7;
 
 /** Ultrawide panel on a central stand, with a light bar clamped on top. */
 function createMonitor(materials: MaterialLibrary): Group {
@@ -38,20 +38,18 @@ function createMonitor(materials: MaterialLibrary): Group {
     roundedBox([MONITOR_WIDTH, height, 0.032], 0.014, materials.get(PALETTE.monitorBack), [MONITOR_X, centerY, MONITOR_Z]),
     // Screen faces the figure, i.e. toward -z.
     box([MONITOR_WIDTH - 0.04, height - 0.035, 0.004], materials.unlit(PALETTE.screen), [MONITOR_X, centerY + 0.008, MONITOR_Z - 0.019]),
-    // Two adjacent panes split by a thin gutter, so it reads as one ultrawide
-    // running a split editor rather than as two separate monitors.
-    box([MONITOR_WIDTH * 0.53, height - 0.06, 0.003], materials.unlit(PALETTE.screenGlow), [MONITOR_X - MONITOR_WIDTH * 0.235, centerY + 0.005, MONITOR_Z - 0.022]),
-    box([MONITOR_WIDTH * 0.41, height - 0.06, 0.003], materials.get(PALETTE.screenGlow, { emissive: PALETTE.screenGlow, emissiveIntensity: 0.3 }), [MONITOR_X + MONITOR_WIDTH * 0.245, centerY + 0.005, MONITOR_Z - 0.022]),
+    // One screen. The previous pair of side-by-side panes read as a dual setup.
+    box([MONITOR_WIDTH - 0.05, height - 0.05, 0.003], materials.unlit(PALETTE.screenGlow), [MONITOR_X, centerY + 0.004, MONITOR_Z - 0.022]),
     // Neck and foot.
     roundedBox([0.08, 0.17, 0.05], 0.02, materials.get(PALETTE.monitorStand), [MONITOR_X, MONITOR_BOTTOM_Y - 0.07, MONITOR_Z + 0.02]),
-    roundedBox([0.3, 0.018, 0.2], 0.008, materials.get(PALETTE.monitorStand), [MONITOR_X, ON_SURFACE + 0.006, MONITOR_Z + 0.02]),
+    roundedBox([0.24, 0.018, 0.18], 0.008, materials.get(PALETTE.monitorStand), [MONITOR_X, ON_SURFACE + 0.006, MONITOR_Z + 0.02]),
   );
 
   // Light bar: a slim housing clamped over the top bezel, throwing warm light
   // forward onto the desk rather than at the screen.
   monitor.add(
-    roundedBox([0.52, 0.035, 0.07], 0.014, shell, [MONITOR_X, MONITOR_TOP_Y + 0.03, MONITOR_Z - 0.01]),
-    box([0.46, 0.008, 0.05], materials.unlit(PALETTE.lightBarGlow), [MONITOR_X, MONITOR_TOP_Y + 0.014, MONITOR_Z - 0.03]),
+    roundedBox([0.42, 0.033, 0.066], 0.013, shell, [MONITOR_X, MONITOR_TOP_Y + 0.028, MONITOR_Z - 0.01]),
+    box([0.37, 0.008, 0.048], materials.unlit(PALETTE.lightBarGlow), [MONITOR_X, MONITOR_TOP_Y + 0.013, MONITOR_Z - 0.03]),
     box([0.06, 0.05, 0.03], shell, [MONITOR_X, MONITOR_TOP_Y + 0.005, MONITOR_Z + 0.02]),
   );
 
@@ -163,36 +161,6 @@ function createMug(materials: MaterialLibrary, at: Point): Group {
   return mug;
 }
 
-/** Snake plant: tall upright blades with pale edges, in a ceramic pot. */
-function createSnakePlant(materials: MaterialLibrary, at: Point): Group {
-  const plant = new Group();
-  const [x, , z] = at;
-  const blade = materials.get(PALETTE.plantLeaf);
-  const edge = materials.get(PALETTE.plantLeafEdge);
-
-  plant.add(
-    cylinder(0.1, 0.085, 0.14, materials.get(PALETTE.plantPot), [x, ON_SURFACE + 0.07, z]),
-    cylinder(0.088, 0.088, 0.02, materials.get(PALETTE.coffee), [x, ON_SURFACE + 0.135, z]),
-  );
-
-  for (let index = 0; index < SNAKE_LEAVES; index += 1) {
-    const angle = (index / SNAKE_LEAVES) * Math.PI * 2 + 0.4;
-    const lean = 0.1 + (index % 3) * 0.06;
-    const height = 0.34 + (index % 4) * 0.07;
-    const reach = 0.045;
-
-    const leaf = box([0.055, height, 0.014], index % 2 === 0 ? blade : edge, [
-      x + Math.cos(angle) * reach,
-      ON_SURFACE + 0.14 + height / 2,
-      z + Math.sin(angle) * reach,
-    ]);
-    leaf.rotation.set(Math.sin(angle) * lean, -angle, -Math.cos(angle) * lean);
-    plant.add(leaf);
-  }
-
-  return plant;
-}
-
 export function createDesk(materials: MaterialLibrary): Group {
   const desk = new Group();
   const legMat = materials.get(PALETTE.deskLeg);
@@ -224,7 +192,6 @@ export function createDesk(materials: MaterialLibrary): Group {
     roundedBox([0.12, 0.011, 0.1], 0.008, materials.get(PALETTE.trackpad), [0.42, ON_SURFACE + 0.005, 0.06]),
     createNotebook(materials, [-0.56, 0, -0.06]),
     createMug(materials, [0.82, 0, -0.2]),
-    createSnakePlant(materials, [-0.86, 0, 0.26]),
   );
 
   return desk;

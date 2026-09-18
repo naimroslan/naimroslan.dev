@@ -7,6 +7,10 @@
         "Space Grotesk", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
         "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 
+    /* Monospace fallback, not sans: a failed webfont then degrades to
+       something with the right rhythm for a pixel face. */
+    --font-pixel: "Press Start 2P", ui-monospace, monospace;
+
     --color-page: var(--page);
     --color-surface: var(--surface);
     --color-fg: var(--fg);
@@ -24,7 +28,7 @@
     --fg-invert: #faf9f7;
     --muted: #6b6f76;
     --line: #e5e3df;
-    --accent: #7d2b35;
+    --accent: #2b5cab;
 
     --dot: rgba(23, 24, 27, 0.08);
     --dot-size: 22px;
@@ -42,7 +46,7 @@ html.dark {
     --fg-invert: #0e0f12;
     --muted: #9a9ea6;
     --line: #272b33;
-    --accent: #cf7280;
+    --accent: #7fb2f0;
 
     --dot: rgba(242, 241, 238, 0.09);
     --dot-size: 26px;

@@ -78,7 +78,11 @@ export default function Navbar({ onToggleTheme }: NavbarProps) {
       >
         <a
           href="#top"
-          className="mr-auto text-lg font-semibold tracking-tight lg:text-xl"
+          // Press Start 2P has a single weight, so font-semibold would trigger
+          // faux bold and smear the pixel grid; negative tracking collides a
+          // monospace pixel face's glyph cells. Sized down because its ~1em
+          // advance reads roughly twice as wide as Space Grotesk's.
+          className="mr-auto font-pixel text-xs lg:text-sm"
         >
           <span className="lg:hidden">n.</span>
           <span className="hidden lg:inline">naimroslan.</span>

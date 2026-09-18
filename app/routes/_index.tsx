@@ -6,7 +6,7 @@ import Projects from "~/components/sections/projects";
 import { useTheme } from "~/hooks/use-theme";
 
 const DESCRIPTION =
-  "Naim Roslan — software engineer. Projects, stack and where to reach me.";
+  "Naim Roslan, product engineer. Projects, stack and contact.";
 
 export const meta = () => [
   { title: "naimroslan" },

@@ -5,6 +5,7 @@
   "scripts": {
     "build": "react-router build && pnpm run check:bundle",
     "dev": "react-router dev",
+    "icons": "node scripts/generate-icons.ts",
     "preview": "pnpm run build && vite preview",
     "deploy": "pnpm run build && wrangler deploy",
     "typegen": "wrangler types && react-router typegen",

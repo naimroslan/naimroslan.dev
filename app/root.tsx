@@ -14,6 +14,11 @@ export const links: Route.LinksFunction = () => [
   // SVG first; favicon.ico stays declared for browsers that cannot use it.
   { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
   { rel: "alternate icon", href: "/favicon.ico", sizes: "any" },
+  // Installed-icon pair. Opaque tiles rather than the transparent favicon:
+  // older iOS reads only this link and ignores manifest icons entirely, and it
+  // composites any transparency onto black.
+  { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" },
+  { rel: "manifest", href: "/site.webmanifest" },
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
     rel: "preconnect",
@@ -36,6 +41,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
         <meta name="theme-color" content="#faf9f7" media="(prefers-color-scheme: light)" />
         <meta name="theme-color" content="#0e0f12" media="(prefers-color-scheme: dark)" />
+        {/* iOS before 17.4 launches standalone from this meta, not the manifest. */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        {/* iOS labels a home screen icon from this, falling back to the page
+            title rather than to the manifest's short_name. Pinning it keeps the
+            label right when the site is added from /contact or a 404. */}
+        <meta name="apple-mobile-web-app-title" content="naimroslan" />
         {/* Light is the default; only an explicit saved choice opts into dark.
             Runs before paint so there is no flash of the wrong theme. */}
         <script

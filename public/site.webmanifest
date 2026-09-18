@@ -1,0 +1,26 @@
+{
+  "id": "/",
+  "name": "naimroslan.dev",
+  "short_name": "naimroslan",
+  "description": "Naim Roslan, product engineer. Projects, stack and contact.",
+  "lang": "en",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#faf9f7",
+  "background_color": "#faf9f7",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

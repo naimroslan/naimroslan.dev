@@ -2,6 +2,7 @@ import { Group } from "three";
 
 import { PALETTE, type MaterialLibrary } from "./palette";
 import { box, cylinder, limb, roundedBox, sphere, torus, type Point } from "./primitives";
+import type { Screens } from "./screens";
 
 export const DESK_SURFACE_Y = 0.75;
 
@@ -27,8 +28,12 @@ const KEY_COLUMNS = 5;
 const KEY_PITCH = 0.031;
 const NOTE_LINES = 4;
 
+/** Inner screen areas, which the screens module fills with content. */
+export const MONITOR_SCREEN = [MONITOR_WIDTH - 0.05, MONITOR_TOP_Y - MONITOR_BOTTOM_Y - 0.05] as const;
+export const LAPTOP_SCREEN = [0.29, 0.195] as const;
+
 /** Ultrawide panel on a central stand, with a light bar clamped on top. */
-function createMonitor(materials: MaterialLibrary): Group {
+function createMonitor(materials: MaterialLibrary, screen: Group): Group {
   const monitor = new Group();
   const height = MONITOR_TOP_Y - MONITOR_BOTTOM_Y;
   const centerY = (MONITOR_TOP_Y + MONITOR_BOTTOM_Y) / 2;
@@ -38,12 +43,16 @@ function createMonitor(materials: MaterialLibrary): Group {
     roundedBox([MONITOR_WIDTH, height, 0.032], 0.014, materials.get(PALETTE.monitorBack), [MONITOR_X, centerY, MONITOR_Z]),
     // Screen faces the figure, i.e. toward -z.
     box([MONITOR_WIDTH - 0.04, height - 0.035, 0.004], materials.unlit(PALETTE.screen), [MONITOR_X, centerY + 0.008, MONITOR_Z - 0.019]),
-    // One screen. The previous pair of side-by-side panes read as a dual setup.
-    box([MONITOR_WIDTH - 0.05, height - 0.05, 0.003], materials.unlit(PALETTE.screenGlow), [MONITOR_X, centerY + 0.004, MONITOR_Z - 0.022]),
+
     // Neck and foot.
     roundedBox([0.08, 0.17, 0.05], 0.02, materials.get(PALETTE.monitorStand), [MONITOR_X, MONITOR_BOTTOM_Y - 0.07, MONITOR_Z + 0.02]),
     roundedBox([0.24, 0.018, 0.18], 0.008, materials.get(PALETTE.monitorStand), [MONITOR_X, ON_SURFACE + 0.006, MONITOR_Z + 0.02]),
   );
+
+  // Screen content faces the figure, i.e. -z, so the panel is turned to face it.
+  screen.position.set(MONITOR_X, centerY + 0.004, MONITOR_Z - 0.021);
+  screen.rotation.y = Math.PI;
+  monitor.add(screen);
 
   // Light bar: a slim housing clamped over the top bezel, throwing warm light
   // forward onto the desk rather than at the screen.
@@ -56,38 +65,47 @@ function createMonitor(materials: MaterialLibrary): Group {
   return monitor;
 }
 
-/** Laptop raised on an angled riser, lid open, screen toward the figure. */
-function createLaptopOnStand(materials: MaterialLibrary, at: Point): Group {
+/**
+ * Laptop on an angled riser, aimed at the figure's head.
+ *
+ * Built at a local origin with the group carrying position and rotation. It
+ * previously placed every part at absolute coordinates, which meant setting
+ * `rotation.y` swung the whole assembly around the world origin instead of
+ * about itself.
+ */
+function createLaptopOnStand(materials: MaterialLibrary, at: Point, yaw: number, screen: Group): Group {
   const laptop = new Group();
-  const [x, , z] = at;
+  laptop.position.set(at[0], 0, at[2]);
+  laptop.rotation.y = yaw;
+
   const shell = materials.get(PALETTE.laptopShell);
   const stand = materials.get(PALETTE.laptopStand);
   const baseY = 0.9;
 
-  const shelf = roundedBox([0.34, 0.014, 0.24], 0.008, stand, [x, baseY - 0.01, z]);
+  const shelf = roundedBox([0.34, 0.014, 0.24], 0.008, stand, [0, baseY - 0.01, 0]);
   shelf.rotation.x = -0.14;
   laptop.add(
     shelf,
-    limb([x - 0.14, ON_SURFACE, z + 0.11], [x - 0.14, baseY - 0.02, z - 0.05], 0.012, stand),
-    limb([x + 0.14, ON_SURFACE, z + 0.11], [x + 0.14, baseY - 0.02, z - 0.05], 0.012, stand),
+    limb([-0.14, ON_SURFACE, 0.11], [-0.14, baseY - 0.02, -0.05], 0.012, stand),
+    limb([0.14, ON_SURFACE, 0.11], [0.14, baseY - 0.02, -0.05], 0.012, stand),
   );
 
-  const deck = roundedBox([0.32, 0.014, 0.22], 0.007, shell, [x, baseY + 0.009, z]);
+  const deck = roundedBox([0.32, 0.014, 0.22], 0.007, shell, [0, baseY + 0.009, 0]);
   deck.rotation.x = -0.14;
-  laptop.add(deck, box([0.26, 0.003, 0.12], materials.get(PALETTE.keycap), [x, baseY + 0.022, z - 0.02]));
+  laptop.add(deck, box([0.26, 0.003, 0.12], materials.get(PALETTE.keycap), [0, baseY + 0.022, -0.02]));
 
   const lid = new Group();
-  lid.position.set(x, baseY + 0.018, z + 0.106);
+  lid.position.set(0, baseY + 0.018, 0.106);
   lid.rotation.x = 0.3;
-  lid.add(
-    roundedBox([0.32, 0.22, 0.012], 0.008, shell, [0, 0.11, 0]),
-    box([0.29, 0.195, 0.003], materials.unlit(PALETTE.screenGlow), [0, 0.11, -0.009]),
-  );
+  lid.add(roundedBox([0.32, 0.22, 0.012], 0.008, shell, [0, 0.11, 0]));
+
+  screen.position.set(0, 0.11, -0.008);
+  screen.rotation.y = Math.PI;
+  lid.add(screen);
   laptop.add(lid);
 
   return laptop;
 }
-
 /** One half of a split keyboard: a tented plate with a small key grid. */
 function createKeyboardHalf(materials: MaterialLibrary, centerX: number, tilt: number): Group {
   const half = new Group();
@@ -161,7 +179,11 @@ function createMug(materials: MaterialLibrary, at: Point): Group {
   return mug;
 }
 
-export function createDesk(materials: MaterialLibrary): Group {
+/** Aims the laptop's screen at the figure's head, which sits at (0, ., -0.62). */
+const LAPTOP_AT = [0.66, 0, 0.16] as const;
+const LAPTOP_YAW_RAD = Math.atan2(LAPTOP_AT[0] - 0, LAPTOP_AT[2] - -0.62);
+
+export function createDesk(materials: MaterialLibrary, screens: Screens): Group {
   const desk = new Group();
   const legMat = materials.get(PALETTE.deskLeg);
 
@@ -182,8 +204,8 @@ export function createDesk(materials: MaterialLibrary): Group {
   desk.add(roundedBox([1.46, 0.05, 0.06], 0.014, legMat, [0, 0.58, 0.02]));
 
   desk.add(
-    createMonitor(materials),
-    createLaptopOnStand(materials, [0.66, 0, 0.16]),
+    createMonitor(materials, screens.monitor),
+    createLaptopOnStand(materials, LAPTOP_AT, LAPTOP_YAW_RAD, screens.laptop),
     createKeyboardHalf(materials, -KEYBOARD_X, 0.15),
     createKeyboardHalf(materials, KEYBOARD_X, -0.15),
     // Mouse: a squashed dome with a scroll strip.

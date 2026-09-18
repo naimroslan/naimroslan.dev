@@ -62,6 +62,17 @@ export const PALETTE = {
   plantPot: 0xe2dcd0,
   plantLeaf: 0x416b48,
   plantLeafEdge: 0x8d9c4e,
+
+  // screen content
+  terminalBg: 0x161b24,
+  terminalChrome: 0x242c3a,
+  agentOne: 0x7fd4a8,
+  agentTwo: 0xe0b877,
+  terminalDim: 0x5f7590,
+  terminalCursor: 0xdfe8f2,
+  windowBg: 0x1b2230,
+  windowChrome: 0x2c3646,
+  windowLine: 0x6b839f,
 } as const;
 
 const DEFAULT_ROUGHNESS = 0.62;

@@ -92,9 +92,12 @@ export default function DeskScene({ theme }: DeskSceneProps) {
     lightsRef.current = lights;
 
     scene.add(lights.hemisphere, lights.key, lights.fill, lights.screen);
-    scene.add(shadow.mesh, createDiorama(materials));
+    const diorama = createDiorama(materials);
+    scene.add(shadow.mesh, diorama.root);
 
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // Reduced motion holds the terminal on a static frame, matching the camera.
+    const animateScreens = !prefersReducedMotion;
     const controller = createOrbitController(canvas, {
       radius: BASE_RADIUS,
       target: TARGET,
@@ -127,10 +130,13 @@ export default function DeskScene({ theme }: DeskSceneProps) {
           : Math.min((time - lastTime) / MS_PER_SECOND, MAX_FRAME_DELTA_S);
       lastTime = time;
 
-      // A static scene (reduced motion, settled camera) stops drawing entirely
-      // rather than repainting an identical frame at 60fps on someone's battery.
+      // A static scene (reduced motion, settled camera, idle screens) stops
+      // drawing entirely rather than repainting an identical frame at 60fps on
+      // someone's battery. The terminal steps ~6 times a second, so an animating
+      // screen costs six redraws a second, not sixty.
       const moved = controller.update(deltaSeconds, camera);
-      if (moved || needsRenderRef.current) {
+      const animated = animateScreens && diorama.update(time / MS_PER_SECOND);
+      if (moved || animated || needsRenderRef.current) {
         needsRenderRef.current = false;
         renderer.render(scene, camera);
       }

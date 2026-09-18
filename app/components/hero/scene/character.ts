@@ -18,8 +18,13 @@ const BROW_Y = 0.03;
 const BEANIE_CUFF_HEIGHT = 0.058;
 /** Places the cuff's underside at 0.052, clear of the brow top at ~0.0355. */
 const BEANIE_CUFF_Y = 0.081;
-/** Turns the head toward the room, away from the desk it faces. */
-const HEAD_TURN_RAD = 0.62;
+/**
+ * Aims the head at the external monitor. The monitor sits at (-0.04, ., 0.24)
+ * and the head at (0, 1.28, -0.62), so that is very nearly straight ahead. The
+ * old +0.62 turned the head away from the desk, which made sense only while the
+ * camera still looked at the figure from the front.
+ */
+const HEAD_TURN_RAD = -0.05;
 
 const SHOULDER_Y = 0.99;
 const HAND_Y = 0.82;

@@ -19,8 +19,8 @@ const HEAD_TURN_RAD = 0.62;
 const SHOULDER_Y = 0.99;
 const HAND_Y = 0.82;
 /** Matches the split keyboard halves in desk.ts. */
-const KEYBOARD_X = 0.17;
-const KEYBOARD_Z = -0.16;
+const KEYBOARD_X = 0.14;
+const KEYBOARD_Z = -0.12;
 
 const ARM_RADIUS = 0.055;
 const PANT_CUFF_Y = 0.17;
@@ -52,6 +52,13 @@ function addHead(character: Group, materials: MaterialLibrary): void {
     roundedBox([0.042, 0.011, 0.012], 0.005, brow, [-0.058, HEAD_Y + 0.036, FACE_Z]),
     roundedBox([0.042, 0.011, 0.012], 0.005, brow, [0.058, HEAD_Y + 0.036, FACE_Z]),
     sphere(0.018, materials.get(PALETTE.skinShade), [0, HEAD_Y - 0.042, FACE_Z], [0.8, 1, 0.8]),
+  );
+
+  // Hair under the beanie: a slightly larger dome at the back and sides, which
+  // the cap then covers from the crown down to the brow.
+  head.add(
+    dome(HEAD_RADIUS + 0.014, materials.get(PALETTE.hair), [0, -0.05, -0.012], [1.02, 0.85, 1.04]),
+    sphere(0.055, materials.get(PALETTE.hair), [0, 0.0, -HEAD_RADIUS * 0.82], [1.5, 0.9, 0.7]),
   );
 
   // Beanie: dome plus a thick folded cuff sitting at the brow line.
@@ -102,42 +109,33 @@ function addHoodie(character: Group, materials: MaterialLibrary): void {
 }
 
 /**
- * Chunky runner built from a few large rounded forms rather than a stack of
- * boxes. The upper is a capsule laid along the foot, so the toe and heel are
- * genuinely round and the sole never projects past it.
+ * Slide sandal: a thick flat footbed with two angled straps over the foot,
+ * worn over a sock. Far fewer forms than a layered runner, and correspondingly
+ * harder to get wrong.
  */
 function addShoe(character: Group, materials: MaterialLibrary, centerX: number): void {
-  const toeZ = -0.1;
-  const heelZ = -0.29;
+  const toeZ = -0.09;
+  const heelZ = -0.3;
   const midZ = (toeZ + heelZ) / 2;
   const footLength = toeZ - heelZ;
-
-  // The upper dominates and overhangs the sole. Previously the sole was the
-  // larger form and projected past the upper at both ends, which is what read
-  // as an ice skate.
-  // The upper rides ON the midsole rather than swallowing it: a chunky pale
-  // midsole band under a darker upper is what reads as a modern runner.
-  // Its rounded corners matter -- a square-ended sole under a capsule upper is
-  // what previously poked out at the toe and looked like a skate blade.
-  const upper = limb(
-    [centerX, 0.088, heelZ + 0.05],
-    [centerX, 0.076, toeZ - 0.022],
-    0.05,
-    materials.get(PALETTE.shoeUpper),
-  );
-  upper.scale.set(0.96, 1, 0.92);
+  const sole = materials.get(PALETTE.slideSole);
+  const strap = materials.get(PALETTE.slide);
 
   character.add(
-    roundedBox([0.098, 0.044, footLength - 0.024], 0.021, materials.get(PALETTE.shoeSole), [centerX, 0.03, midZ - 0.002]),
-    roundedBox([0.094, 0.013, footLength - 0.04], 0.006, materials.get(PALETTE.shoeHeel), [centerX, 0.008, midZ - 0.002]),
-    upper,
-    // Swoosh-ish side accent, low on the upper where it belongs.
-    roundedBox([0.104, 0.016, 0.05], 0.007, materials.get(PALETTE.shoeAccent), [centerX, 0.072, midZ + 0.02]),
-    // Ankle collar, wider than the sock so the sock reads as tucked inside.
-    cylinder(0.05, 0.047, 0.03, materials.get(PALETTE.shoeMid), [centerX, 0.115, heelZ + 0.062]),
+    // Footbed on a slightly narrower outsole, so the edge reads as two layers.
+    roundedBox([0.105, 0.03, footLength], 0.014, sole, [centerX, 0.037, midZ]),
+    roundedBox([0.098, 0.018, footLength - 0.018], 0.008, strap, [centerX, 0.012, midZ]),
+    // The sock foot sits in the footbed, giving the straps something to cross.
+    limb([centerX, 0.078, heelZ + 0.055], [centerX, 0.07, toeZ - 0.035], 0.042, materials.get(PALETTE.sock)),
   );
-}
 
+  // Two straps, angled the way a slide's are.
+  for (const [offset, tilt] of [[0.045, 0.24], [-0.028, -0.16]] as const) {
+    const band = roundedBox([0.114, 0.03, 0.042], 0.013, strap, [centerX, 0.088, midZ + offset]);
+    band.rotation.x = tilt;
+    character.add(band);
+  }
+}
 function addLegs(character: Group, materials: MaterialLibrary): void {
   const pants = materials.get(PALETTE.pants);
 

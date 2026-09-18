@@ -20,7 +20,7 @@ const DAMPING_RATE = 10;
 
 const POLAR_MIN_RAD = 0.72;
 const POLAR_MAX_RAD = 1.28;
-const POLAR_REST_RAD = 1.02;
+const POLAR_REST_RAD = 0.95;
 const POLAR_RECENTER_RATE = 1.1;
 
 /** Pointer travel before a touch gesture is classified as rotate or scroll. */
@@ -93,8 +93,12 @@ export function createOrbitController(
   let gateY = 0;
   let lastX = 0;
   let lastY = 0;
+  // NaN means "nothing drawn yet". It must be treated as *moved*, never fed to
+  // a comparison: Math.abs(x - NaN) is NaN and NaN > epsilon is false, which
+  // froze the scene on its first frame.
   let lastRenderedAzimuth = Number.NaN;
   let lastRenderedPolar = Number.NaN;
+  let dirty = true;
 
   element.style.touchAction = "pan-y pinch-zoom";
 
@@ -194,9 +198,14 @@ export function createOrbitController(
       camera.lookAt(target);
 
       const moved =
+        dirty ||
+        !Number.isFinite(lastRenderedAzimuth) ||
+        !Number.isFinite(lastRenderedPolar) ||
         Math.abs(azimuth - lastRenderedAzimuth) > SETTLED_EPSILON_RAD ||
         Math.abs(polar - lastRenderedPolar) > SETTLED_EPSILON_RAD;
+
       if (moved) {
+        dirty = false;
         lastRenderedAzimuth = azimuth;
         lastRenderedPolar = polar;
       }
@@ -204,8 +213,11 @@ export function createOrbitController(
     },
 
     setRadius(next) {
+      if (next === radius) return;
       radius = next;
-      lastRenderedAzimuth = Number.NaN;
+      // Request a frame. Writing NaN to the comparison sentinel here is what
+      // wedged the movement check permanently.
+      dirty = true;
     },
 
     dispose() {

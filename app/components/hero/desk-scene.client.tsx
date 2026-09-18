@@ -19,17 +19,20 @@ import { createMaterialLibrary } from "./scene/palette";
 const FOV_DEG = 32;
 const NEAR_PLANE = 0.1;
 const FAR_PLANE = 20;
-const BASE_RADIUS = 8;
+const BASE_RADIUS = 4.7;
 /** Pull the camera back on portrait-ish canvases so the desk still fits. */
 const NARROW_ASPECT_BOOST = 0.45;
 const DESKTOP_MAX_DPR = 2;
 const TOUCH_MAX_DPR = 1.5;
 const MAX_FRAME_DELTA_S = 0.05;
 const MS_PER_SECOND = 1000;
-/** Opens on the desk nook, looking in through the cutaway corner. */
-const START_AZIMUTH_RAD = 0.58;
+/**
+ * Over the figure's left shoulder, matching the owner's reference. A pure
+ * side-on view reads the desk end-on and hides the screen entirely.
+ */
+const START_AZIMUTH_RAD = 2.55;
 
-const TARGET = new Vector3(0, 1.15, 0);
+const TARGET = new Vector3(0, 0.76, -0.05);
 
 const fitRadius = (aspect: number) =>
   aspect >= 1 ? BASE_RADIUS : BASE_RADIUS * (1 + (1 - aspect) * NARROW_ASPECT_BOOST);

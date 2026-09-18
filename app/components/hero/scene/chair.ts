@@ -22,16 +22,25 @@ export function createChair(materials: MaterialLibrary): Group {
   const frame = materials.get(PALETTE.chair);
 
   // Seat and backrest, slightly reclined.
-  const backrest = roundedBox([0.4, 0.52, 0.055], 0.026, frame, [0, 0.82, CHAIR_Z - 0.2]);
-  backrest.rotation.x = -0.09;
-
-  chair.add(roundedBox([0.44, 0.055, 0.42], 0.026, frame, [0, SEAT_Y, CHAIR_Z]), backrest);
+  // Backrest as a frame around a thinner inset panel, so it reads as mesh
+  // stretched on a rim rather than a solid slab.
+  const back = new Group();
+  back.position.set(0, 0.78, CHAIR_Z - 0.2);
+  back.rotation.x = -0.1;
+  const rim = materials.get(PALETTE.chairFrame);
+  back.add(
+    roundedBox([0.42, 0.48, 0.05], 0.028, rim, [0, 0, 0]),
+    roundedBox([0.34, 0.39, 0.022], 0.02, materials.get(PALETTE.chairMesh), [0, 0.01, 0.018]),
+    // Lumbar bar across the lower back.
+    roundedBox([0.44, 0.06, 0.06], 0.026, rim, [0, -0.2, 0.01]),
+  );
+  chair.add(roundedBox([0.46, 0.06, 0.44], 0.028, frame, [0, SEAT_Y, CHAIR_Z]), back);
 
   // Armrests on short posts.
   for (const side of [-1, 1]) {
     chair.add(
-      roundedBox([0.045, 0.035, 0.24], 0.016, frame, [side * 0.24, 0.63, CHAIR_Z + 0.02]),
-      roundedBox([0.03, 0.16, 0.03], 0.012, materials.get(PALETTE.chairShade), [side * 0.24, 0.53, CHAIR_Z + 0.1]),
+      roundedBox([0.055, 0.04, 0.26], 0.018, materials.get(PALETTE.chairFrame), [side * 0.25, 0.64, CHAIR_Z + 0.03]),
+      roundedBox([0.032, 0.18, 0.032], 0.014, frame, [side * 0.25, 0.54, CHAIR_Z + 0.12]),
     );
   }
 
@@ -49,7 +58,7 @@ export function createChair(materials: MaterialLibrary): Group {
 
     chair.add(
       limb([0, BASE_Y, CHAIR_Z], [toX, BASE_Y - 0.012, CHAIR_Z + toZ], 0.018, frame),
-      cylinder(CASTOR_RADIUS, CASTOR_RADIUS, 0.018, materials.get(PALETTE.chairShade), [toX, CASTOR_RADIUS, CHAIR_Z + toZ]),
+      cylinder(CASTOR_RADIUS, CASTOR_RADIUS, 0.02, materials.get(PALETTE.chairMesh), [toX, CASTOR_RADIUS, CHAIR_Z + toZ]),
     );
   }
 
